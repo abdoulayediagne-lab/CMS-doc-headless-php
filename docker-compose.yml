@@ -1,0 +1,29 @@
+services:
+     php-framework-php:
+          container_name: php-framework-php
+          build:
+               context: .
+               dockerfile: Dockerfile
+          volumes: 
+               - ./app:/var/www/html
+               - ./log:/var/log/apache2/
+          ports:
+               - 8080:80
+               - 8888:8000
+     php-framework-mysql:
+          image: mysql:latest
+          container_name: php-mysql-framework
+          restart: unless-stopped
+          environment:
+            MYSQL_DATABASE: 'db'
+            # So you don't have to use root, but you can if you like
+            MYSQL_USER: 'user'
+            # You can use whatever password you like
+            MYSQL_PASSWORD: 'password'
+            # Password for root access
+            MYSQL_ROOT_PASSWORD: 'password'
+          ports:
+            - '3306:3306'
+          volumes:
+            - ./mysql:/var/lib/mysql
+     
