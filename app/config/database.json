@@ -1,0 +1,7 @@
+{
+  "host": "php-framework-mysql",
+  "user": "root",
+  "password": "password",
+  "database": "test",
+  "port": 3306
+}
