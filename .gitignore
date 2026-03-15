@@ -1,1 +1,4 @@
 app/vendor
+pgdata/
+mysql/
+log/
