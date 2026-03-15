@@ -13,15 +13,22 @@ class Dsn {
     private string $dsn;
 
     public function __construct() {
-        $config = self::getConfig();
+    $config = self::getConfig();
 
-        $this->host = $config['host'];
-        $this->user = $config['user'];
-        $this->password = $config['password'];
-        $this->dbname = $config['database'];
-        $this->port = $config['port'];
-        $this->dsn = 'mysql:';
+    $this->host = $config['host'];
+    $this->user = $config['user'];
+    $this->password = $config['password'];
+    $this->dbname = $config['database'];
+    $this->port = $config['port'];
+
+    // Vérification du SGBD
+    $driver = $config['driver'] ?? 'pgsql';
+    if ($driver !== 'pgsql') {
+        throw new \RuntimeException("SGBD non supporté : '$driver'. Seul PostgreSQL est supporté.");
     }
+
+    $this->dsn = 'pgsql:';
+}
 
     public function getUser(): string {
         return $this->user;
