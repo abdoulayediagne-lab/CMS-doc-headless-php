@@ -1,7 +1,8 @@
 {
-  "host": "php-framework-mysql",
-  "user": "root",
+  "driver": "pgsql",
+  "host": "php-framework-db",
+  "user": "user",
   "password": "password",
-  "database": "test",
-  "port": 3306
+  "database": "cms_db",
+  "port": 5432
 }
