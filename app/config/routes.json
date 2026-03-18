@@ -1,40 +1,5 @@
 [
   {
-    "path": "/artist",
-    "method": "GET",
-    "controller": "Artist\\GetArtistsController"
-  },
-  {
-    "path": "/artist/:id",
-    "method": "GET",
-    "controller": "Artist\\GetArtistController"
-  },
-  {
-    "path": "/artist",
-    "method": "POST",
-    "controller": "Artist\\PostArtistController"
-  },
-  {
-    "path": "/artist/:id",
-    "method": "PATCH",
-    "controller": "Artist\\PatchArtistController"
-  },
-  {
-    "path": "/artist/:id",
-    "method": "DELETE",
-    "controller": "Artist\\DeleteArtistController"
-  },
-  {
-    "path": "/album",
-    "method": "POST",
-    "controller": "Album\\PostAlbumController"
-  },
-  {
-    "path": "/album",
-    "method": "GET",
-    "controller": "Album\\GetAlbumsController"
-  },
-  {
     "path": "/test",
     "method": "GET",
     "controller": "TestController"
