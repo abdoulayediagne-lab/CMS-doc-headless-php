@@ -8,13 +8,21 @@ use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
 use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
+use App\Repositories\DocumentVersionRepository;
 
 class PutDocumentController extends AbstractController {
 
+    private const TRANSITIONS = [
+        'draft'     => ['review'],
+        'review'    => ['published', 'draft'],
+        'published' => ['archived', 'draft'],
+        'archived'  => ['draft'],
+    ];
+
     public function process(Request $request): Response {
-        // Seuls admin et editor peuvent modifier
+        // Admin, editor et author peuvent modifier
         $authGuard = new AuthGuard();
-        $user = $authGuard->authorize($request, ['admin', 'editor']);
+        $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
         if ($user instanceof Response) {
             return $user;
         }
@@ -42,6 +50,7 @@ class PutDocumentController extends AbstractController {
         $oldValues = [
             'title' => $document->title,
             'slug' => $document->slug,
+            'content' => $document->content,
             'status' => $document->status,
             'section_id' => $document->section_id,
             'meta_title' => $document->meta_title,
@@ -49,8 +58,8 @@ class PutDocumentController extends AbstractController {
             'sort_order' => $document->sort_order,
         ];
 
-        // Un editor ne peut modifier que ses propres documents
-        if ($user->getRole() === 'editor' && $document->author_id !== $user->getId()) {
+        // Un author/editor ne peut modifier que ses propres documents
+        if (in_array($user->getRole(), ['editor', 'author']) && $document->author_id !== $user->getId()) {
             return new Response(
                 json_encode(['error' => 'forbidden: you can only edit your own documents']),
                 403,
@@ -67,6 +76,16 @@ class PutDocumentController extends AbstractController {
             );
         }
 
+        if ($user->getRole() === 'author') {
+            if (isset($payload['status']) && $payload['status'] !== 'review') {
+                return new Response(
+                    json_encode(['error' => 'authors can only submit for review (draft → review)']),
+                    403,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+        }
+
         $tagSlugs = null;
         if (array_key_exists('tags', $payload)) {
             $tagSlugs = $this->normalizeTagSlugs($payload['tags']);
@@ -77,10 +96,27 @@ class PutDocumentController extends AbstractController {
             $allowedStatuses = ['draft', 'review', 'published', 'archived'];
             if (!in_array($payload['status'], $allowedStatuses, true)) {
                 return new Response(
-                    json_encode(['error' => 'invalid status']),
+                    json_encode(['error' => 'invalid status. Allowed: draft, review, published, archived']),
                     400,
                     ['Content-Type' => 'application/json']
                 );
+            }
+
+            $currentStatus = $document->getStatus();
+            $newStatus = $payload['status'];
+
+            if ($currentStatus !== $newStatus && $user->getRole() !== 'admin') {
+                $allowedTransitions = self::TRANSITIONS[$currentStatus] ?? [];
+                if (!in_array($newStatus, $allowedTransitions, true)) {
+                    return new Response(
+                        json_encode([
+                            'error' => "invalid transition: $currentStatus → $newStatus",
+                            'allowed_transitions' => $allowedTransitions,
+                        ]),
+                        422,
+                        ['Content-Type' => 'application/json']
+                    );
+                }
             }
         }
 
@@ -102,6 +138,15 @@ class PutDocumentController extends AbstractController {
             $payload['published_at'] = null;
         }
 
+        // Créer une version avant la modification (historique/versioning - exigé par la consigne)
+        $versionRepository = new DocumentVersionRepository();
+        $versionNumber = $versionRepository->createVersion(
+            $document->getId(),
+            $user->getId(),
+            $document->title,
+            $document->content
+        );
+
         $updated = $documentRepository->updateDocument($id, $payload);
 
         if ($updated === null) {
@@ -119,10 +164,16 @@ class PutDocumentController extends AbstractController {
         $tagsByDocumentId = $documentRepository->findTagsForDocumentIds([$updated->getId()]);
         $tags = $tagsByDocumentId[$updated->getId()] ?? [];
 
+        // Audit log
         $auditLogRepository = new AuditLogRepository();
+        $action = 'update';
+        if (isset($payload['status']) && $payload['status'] !== $oldValues['status']) {
+            $action = 'status_change:' . $oldValues['status'] . '→' . $payload['status'];
+        }
+
         $auditLogRepository->logAction(
             $user->getId(),
-            'update',
+            $action,
             'document',
             $updated->getId(),
             $oldValues,
@@ -135,6 +186,7 @@ class PutDocumentController extends AbstractController {
                 'meta_description' => $updated->meta_description,
                 'sort_order' => $updated->sort_order,
                 'tags' => $tags,
+                'version' => $versionNumber,
             ]
         );
 
@@ -144,6 +196,7 @@ class PutDocumentController extends AbstractController {
                 'title' => $updated->getTitle(),
                 'slug' => $updated->getSlug(),
                 'status' => $updated->getStatus(),
+                'version' => $versionNumber,
                 'tags' => $tags,
                 'updated_at' => $updated->updated_at,
             ]),
