@@ -1,5 +1,10 @@
 [
   {
+    "path": "/auth/login",
+    "method": "POST",
+    "controller": "Auth\\PostLoginController"
+  },
+  {
     "path": "/test",
     "method": "GET",
     "controller": "TestController"
