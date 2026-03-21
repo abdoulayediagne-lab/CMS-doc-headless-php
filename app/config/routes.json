@@ -5,6 +5,11 @@
     "controller": "Auth\\PostLoginController"
   },
   {
+    "path": "/me",
+    "method": "GET",
+    "controller": "Auth\\GetMeController"
+  },
+  {
     "path": "/test",
     "method": "GET",
     "controller": "TestController"
