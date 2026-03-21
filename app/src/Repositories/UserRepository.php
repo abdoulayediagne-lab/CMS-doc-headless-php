@@ -51,6 +51,14 @@ class UserRepository extends AbstractRepository {
 
         return $this->findByEmail($email);
     }
+
+    public function countUsers(): int {
+        $query = 'SELECT COUNT(*) FROM users';
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute();
+
+        return (int) $statement->fetchColumn();
+    }
 }
 
 ?>
