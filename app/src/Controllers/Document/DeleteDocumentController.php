@@ -6,14 +6,15 @@ use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
+use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
 
 class DeleteDocumentController extends AbstractController {
 
     public function process(Request $request): Response {
-        // Seuls admin et editor peuvent supprimer
+        // Seuls admin peuvent supprimer
         $authGuard = new AuthGuard();
-        $user = $authGuard->authorize($request, ['admin', 'editor']);
+        $user = $authGuard->authorize($request, ['admin']);
         if ($user instanceof Response) {
             return $user;
         }
@@ -38,6 +39,13 @@ class DeleteDocumentController extends AbstractController {
             );
         }
 
+        $oldValues = [
+            'title' => $document->title,
+            'slug' => $document->slug,
+            'status' => $document->status,
+            'section_id' => $document->section_id,
+        ];
+
         $deleted = $documentRepository->deleteDocument($id);
 
         if ($deleted === false) {
@@ -47,6 +55,16 @@ class DeleteDocumentController extends AbstractController {
                 ['Content-Type' => 'application/json']
             );
         }
+
+        $auditLogRepository = new AuditLogRepository();
+        $auditLogRepository->logAction(
+            $user->getId(),
+            'delete',
+            'document',
+            $id,
+            $oldValues,
+            null
+        );
 
         return new Response('', 204, ['Content-Type' => 'application/json']);
     }

@@ -6,14 +6,15 @@ use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
+use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
 
 class PutDocumentController extends AbstractController {
 
     public function process(Request $request): Response {
-        // Seuls admin, editor et author peuvent modifier
+        // Seuls admin et editor peuvent modifier
         $authGuard = new AuthGuard();
-        $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
+        $user = $authGuard->authorize($request, ['admin', 'editor']);
         if ($user instanceof Response) {
             return $user;
         }
@@ -38,8 +39,18 @@ class PutDocumentController extends AbstractController {
             );
         }
 
-        // Un auteur ne peut modifier que ses propres documents
-        if ($user->getRole() === 'author' && $document->author_id !== $user->getId()) {
+        $oldValues = [
+            'title' => $document->title,
+            'slug' => $document->slug,
+            'status' => $document->status,
+            'section_id' => $document->section_id,
+            'meta_title' => $document->meta_title,
+            'meta_description' => $document->meta_description,
+            'sort_order' => $document->sort_order,
+        ];
+
+        // Un editor ne peut modifier que ses propres documents
+        if ($user->getRole() === 'editor' && $document->author_id !== $user->getId()) {
             return new Response(
                 json_encode(['error' => 'forbidden: you can only edit your own documents']),
                 403,
@@ -56,6 +67,23 @@ class PutDocumentController extends AbstractController {
             );
         }
 
+        $tagSlugs = null;
+        if (array_key_exists('tags', $payload)) {
+            $tagSlugs = $this->normalizeTagSlugs($payload['tags']);
+            unset($payload['tags']);
+        }
+
+        if (isset($payload['status'])) {
+            $allowedStatuses = ['draft', 'review', 'published', 'archived'];
+            if (!in_array($payload['status'], $allowedStatuses, true)) {
+                return new Response(
+                    json_encode(['error' => 'invalid status']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+        }
+
         // Si le slug change, vérifier l'unicité
         if (isset($payload['slug']) && $payload['slug'] !== $document->getSlug()) {
             if ($documentRepository->findBySlug($payload['slug']) !== null) {
@@ -70,6 +98,8 @@ class PutDocumentController extends AbstractController {
         // Gérer la publication (mettre published_at si le statut passe à published)
         if (isset($payload['status']) && $payload['status'] === 'published' && !$document->isPublished()) {
             $payload['published_at'] = date('Y-m-d H:i:s');
+        } elseif (isset($payload['status']) && $payload['status'] !== 'published') {
+            $payload['published_at'] = null;
         }
 
         $updated = $documentRepository->updateDocument($id, $payload);
@@ -82,17 +112,68 @@ class PutDocumentController extends AbstractController {
             );
         }
 
+        if ($tagSlugs !== null) {
+            $documentRepository->replaceDocumentTags($id, $tagSlugs);
+        }
+
+        $tagsByDocumentId = $documentRepository->findTagsForDocumentIds([$updated->getId()]);
+        $tags = $tagsByDocumentId[$updated->getId()] ?? [];
+
+        $auditLogRepository = new AuditLogRepository();
+        $auditLogRepository->logAction(
+            $user->getId(),
+            'update',
+            'document',
+            $updated->getId(),
+            $oldValues,
+            [
+                'title' => $updated->title,
+                'slug' => $updated->slug,
+                'status' => $updated->status,
+                'section_id' => $updated->section_id,
+                'meta_title' => $updated->meta_title,
+                'meta_description' => $updated->meta_description,
+                'sort_order' => $updated->sort_order,
+                'tags' => $tags,
+            ]
+        );
+
         return new Response(
             json_encode([
                 'id' => $updated->getId(),
                 'title' => $updated->getTitle(),
                 'slug' => $updated->getSlug(),
                 'status' => $updated->getStatus(),
+                'tags' => $tags,
                 'updated_at' => $updated->updated_at,
             ]),
             200,
             ['Content-Type' => 'application/json']
         );
+    }
+
+    private function normalizeTagSlugs(mixed $tags): array {
+        if (!is_array($tags)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($tags as $tag) {
+            if (!is_string($tag)) {
+                continue;
+            }
+
+            $slug = strtolower(trim($tag));
+            $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+            $slug = preg_replace('/[\s-]+/', '-', $slug);
+            $slug = trim($slug, '-');
+
+            if ($slug !== '') {
+                $normalized[] = $slug;
+            }
+        }
+
+        return array_values(array_unique($normalized));
     }
 }
 

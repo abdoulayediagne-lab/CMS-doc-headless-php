@@ -7,11 +7,13 @@ use App\Lib\Http\Request;
 use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
 use App\Lib\Security\JwtService;
+use App\Repositories\AuditLogRepository;
 use App\Repositories\UserRepository;
 
 class PostRegisterController extends AbstractController {
     public function process(Request $request): Response {
         $userRepository = new UserRepository();
+        $actorId = null;
 
         // Bootstrap rule: first account can be created without admin token.
         if ($userRepository->countUsers() > 0) {
@@ -20,6 +22,7 @@ class PostRegisterController extends AbstractController {
             if ($authorizedUser instanceof Response) {
                 return $authorizedUser;
             }
+            $actorId = $authorizedUser->getId();
         }
 
         $payload = json_decode($request->getPayload(), true);
@@ -75,6 +78,19 @@ class PostRegisterController extends AbstractController {
             'email' => $user->getEmail(),
             'role' => $user->getRole(),
         ]);
+
+        $auditLogRepository = new AuditLogRepository();
+        $auditLogRepository->logAction(
+            $actorId ?? $user->getId(),
+            'register',
+            'user',
+            $user->getId(),
+            null,
+            [
+                'email' => $user->getEmail(),
+                'role' => $user->getRole(),
+            ]
+        );
 
         return new Response(
             json_encode([

@@ -6,14 +6,15 @@ use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
+use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
 
 class PostDocumentController extends AbstractController {
 
     public function process(Request $request): Response {
-        // Seuls admin, editor et author peuvent créer des documents
+        // Seuls admin et editor peuvent créer des documents
         $authGuard = new AuthGuard();
-        $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
+        $user = $authGuard->authorize($request, ['admin', 'editor']);
         if ($user instanceof Response) {
             return $user;
         }
@@ -30,6 +31,17 @@ class PostDocumentController extends AbstractController {
 
         $title = trim((string) $payload['title']);
         $slug = $payload['slug'] ?? $this->generateSlug($title);
+        $status = $payload['status'] ?? 'draft';
+        $tagSlugs = $this->normalizeTagSlugs($payload['tags'] ?? []);
+
+        $allowedStatuses = ['draft', 'review', 'published', 'archived'];
+        if (!in_array($status, $allowedStatuses, true)) {
+            return new Response(
+                json_encode(['error' => 'invalid status']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
 
         // Vérifier l'unicité du slug
         $documentRepository = new DocumentRepository();
@@ -45,7 +57,7 @@ class PostDocumentController extends AbstractController {
             'title' => $title,
             'slug' => $slug,
             'content' => $payload['content'] ?? '',
-            'status' => $payload['status'] ?? 'draft',
+            'status' => $status,
             'section_id' => $payload['section_id'] ?? null,
             'author_id' => $user->getId(),
             'meta_title' => $payload['meta_title'] ?? null,
@@ -61,12 +73,34 @@ class PostDocumentController extends AbstractController {
             );
         }
 
+        if (!empty($tagSlugs)) {
+            $documentRepository->replaceDocumentTags($document->getId(), $tagSlugs);
+        }
+
+        $tagsByDocumentId = $documentRepository->findTagsForDocumentIds([$document->getId()]);
+        $tags = $tagsByDocumentId[$document->getId()] ?? [];
+
+        $auditLogRepository = new AuditLogRepository();
+        $auditLogRepository->logAction(
+            $user->getId(),
+            'create',
+            'document',
+            $document->getId(),
+            null,
+            [
+                'title' => $document->getTitle(),
+                'status' => $document->getStatus(),
+                'tags' => $tags,
+            ]
+        );
+
         return new Response(
             json_encode([
                 'id' => $document->getId(),
                 'title' => $document->getTitle(),
                 'slug' => $document->getSlug(),
                 'status' => $document->getStatus(),
+                'tags' => $tags,
                 'author_id' => $document->author_id,
                 'created_at' => $document->created_at,
             ]),
@@ -80,6 +114,30 @@ class PostDocumentController extends AbstractController {
         $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
         $slug = preg_replace('/[\s-]+/', '-', $slug);
         return trim($slug, '-');
+    }
+
+    private function normalizeTagSlugs(mixed $tags): array {
+        if (!is_array($tags)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($tags as $tag) {
+            if (!is_string($tag)) {
+                continue;
+            }
+
+            $slug = strtolower(trim($tag));
+            $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+            $slug = preg_replace('/[\s-]+/', '-', $slug);
+            $slug = trim($slug, '-');
+
+            if ($slug !== '') {
+                $normalized[] = $slug;
+            }
+        }
+
+        return array_values(array_unique($normalized));
     }
 }
 
