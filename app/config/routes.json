@@ -1,5 +1,10 @@
 [
   {
+    "path": "/auth/register",
+    "method": "POST",
+    "controller": "Auth\\PostRegisterController"
+  },
+  {
     "path": "/auth/login",
     "method": "POST",
     "controller": "Auth\\PostLoginController"
