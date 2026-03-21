@@ -25,6 +25,16 @@
     "controller": "Auth\\GetMeController"
   },
   {
+    "path": "/documents/:id/versions",
+    "method": "GET",
+    "controller": "Document\\GetDocumentVersionsController"
+  },
+  {
+    "path": "/documents/:id/preview",
+    "method": "GET",
+    "controller": "Document\\GetDocumentPreviewController"
+  },
+  {
     "path": "/test",
     "method": "GET",
     "controller": "TestController"
