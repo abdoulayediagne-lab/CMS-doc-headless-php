@@ -20,6 +20,17 @@ class UserRepository extends AbstractRepository {
 
         return $user === false ? null : $user;
     }
+
+    public function findById(int $id): ?User {
+        $query = 'SELECT * FROM users WHERE id = :id LIMIT 1';
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute(['id' => $id]);
+        $statement->setFetchMode(\PDO::FETCH_CLASS, User::class);
+
+        $user = $statement->fetch();
+
+        return $user === false ? null : $user;
+    }
 }
 
 ?>

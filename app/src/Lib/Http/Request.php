@@ -58,6 +58,29 @@ class Request {
         return $this->headers;
     }
 
+    public function getHeader(string $name): ?string {
+        foreach ($this->headers as $headerName => $value) {
+            if (strtolower($headerName) === strtolower($name)) {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
+    public function getBearerToken(): ?string {
+        $authorizationHeader = $this->getHeader('Authorization');
+        if ($authorizationHeader === null) {
+            return null;
+        }
+
+        if (preg_match('/^Bearer\s+(.*)$/i', $authorizationHeader, $matches) !== 1) {
+            return null;
+        }
+
+        return trim($matches[1]);
+    }
+
     public function getPayload(): string {
         return $this->payload;
     }
