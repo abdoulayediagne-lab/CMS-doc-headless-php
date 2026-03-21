@@ -214,6 +214,62 @@ class DocumentRepository extends AbstractRepository {
         return $tagsByDocumentId;
     }
 
+    public function replaceDocumentTags(int $documentId, array $tagSlugs): void {
+        $connection = $this->db->getConnexion();
+        $connection->beginTransaction();
+
+        try {
+            $deleteStatement = $connection->prepare('DELETE FROM document_tags WHERE document_id = :document_id');
+            $deleteStatement->execute(['document_id' => $documentId]);
+
+            if (!empty($tagSlugs)) {
+                $insertStatement = $connection->prepare('INSERT INTO document_tags (document_id, tag_id) VALUES (:document_id, :tag_id)');
+
+                foreach ($tagSlugs as $tagSlug) {
+                    $tagId = $this->findTagIdBySlug($tagSlug);
+                    if ($tagId === null) {
+                        $tagId = $this->createTagFromSlug($tagSlug);
+                    }
+
+                    $insertStatement->execute([
+                        'document_id' => $documentId,
+                        'tag_id' => $tagId,
+                    ]);
+                }
+            }
+
+            $connection->commit();
+        } catch (\Throwable $exception) {
+            if ($connection->inTransaction()) {
+                $connection->rollBack();
+            }
+
+            throw $exception;
+        }
+    }
+
+    private function findTagIdBySlug(string $slug): ?int {
+        $statement = $this->db->getConnexion()->prepare('SELECT id FROM tags WHERE slug = :slug LIMIT 1');
+        $statement->execute(['slug' => $slug]);
+
+        $id = $statement->fetchColumn();
+
+        return $id === false ? null : (int) $id;
+    }
+
+    private function createTagFromSlug(string $slug): int {
+        $name = str_replace('-', ' ', $slug);
+        $name = ucwords($name);
+
+        $statement = $this->db->getConnexion()->prepare('INSERT INTO tags (name, slug) VALUES (:name, :slug)');
+        $statement->execute([
+            'name' => $name,
+            'slug' => $slug,
+        ]);
+
+        return (int) $this->db->getConnexion()->lastInsertId();
+    }
+
     public function create(array $data): ?Document {
         $query = 'INSERT INTO documents (section_id, author_id, title, slug, content, status, meta_title, meta_description, sort_order) 
                   VALUES (:section_id, :author_id, :title, :slug, :content, :status, :meta_title, :meta_description, :sort_order)';

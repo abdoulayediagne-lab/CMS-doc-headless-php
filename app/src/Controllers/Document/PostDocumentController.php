@@ -31,6 +31,7 @@ class PostDocumentController extends AbstractController {
         $title = trim((string) $payload['title']);
         $slug = $payload['slug'] ?? $this->generateSlug($title);
         $status = $payload['status'] ?? 'draft';
+        $tagSlugs = $this->normalizeTagSlugs($payload['tags'] ?? []);
 
         $allowedStatuses = ['draft', 'review', 'published', 'archived'];
         if (!in_array($status, $allowedStatuses, true)) {
@@ -71,12 +72,20 @@ class PostDocumentController extends AbstractController {
             );
         }
 
+        if (!empty($tagSlugs)) {
+            $documentRepository->replaceDocumentTags($document->getId(), $tagSlugs);
+        }
+
+        $tagsByDocumentId = $documentRepository->findTagsForDocumentIds([$document->getId()]);
+        $tags = $tagsByDocumentId[$document->getId()] ?? [];
+
         return new Response(
             json_encode([
                 'id' => $document->getId(),
                 'title' => $document->getTitle(),
                 'slug' => $document->getSlug(),
                 'status' => $document->getStatus(),
+                'tags' => $tags,
                 'author_id' => $document->author_id,
                 'created_at' => $document->created_at,
             ]),
@@ -90,6 +99,30 @@ class PostDocumentController extends AbstractController {
         $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
         $slug = preg_replace('/[\s-]+/', '-', $slug);
         return trim($slug, '-');
+    }
+
+    private function normalizeTagSlugs(mixed $tags): array {
+        if (!is_array($tags)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($tags as $tag) {
+            if (!is_string($tag)) {
+                continue;
+            }
+
+            $slug = strtolower(trim($tag));
+            $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+            $slug = preg_replace('/[\s-]+/', '-', $slug);
+            $slug = trim($slug, '-');
+
+            if ($slug !== '') {
+                $normalized[] = $slug;
+            }
+        }
+
+        return array_values(array_unique($normalized));
     }
 }
 

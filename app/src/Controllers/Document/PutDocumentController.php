@@ -56,6 +56,12 @@ class PutDocumentController extends AbstractController {
             );
         }
 
+        $tagSlugs = null;
+        if (array_key_exists('tags', $payload)) {
+            $tagSlugs = $this->normalizeTagSlugs($payload['tags']);
+            unset($payload['tags']);
+        }
+
         if (isset($payload['status'])) {
             $allowedStatuses = ['draft', 'review', 'published', 'archived'];
             if (!in_array($payload['status'], $allowedStatuses, true)) {
@@ -95,17 +101,49 @@ class PutDocumentController extends AbstractController {
             );
         }
 
+        if ($tagSlugs !== null) {
+            $documentRepository->replaceDocumentTags($id, $tagSlugs);
+        }
+
+        $tagsByDocumentId = $documentRepository->findTagsForDocumentIds([$updated->getId()]);
+        $tags = $tagsByDocumentId[$updated->getId()] ?? [];
+
         return new Response(
             json_encode([
                 'id' => $updated->getId(),
                 'title' => $updated->getTitle(),
                 'slug' => $updated->getSlug(),
                 'status' => $updated->getStatus(),
+                'tags' => $tags,
                 'updated_at' => $updated->updated_at,
             ]),
             200,
             ['Content-Type' => 'application/json']
         );
+    }
+
+    private function normalizeTagSlugs(mixed $tags): array {
+        if (!is_array($tags)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($tags as $tag) {
+            if (!is_string($tag)) {
+                continue;
+            }
+
+            $slug = strtolower(trim($tag));
+            $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+            $slug = preg_replace('/[\s-]+/', '-', $slug);
+            $slug = trim($slug, '-');
+
+            if ($slug !== '') {
+                $normalized[] = $slug;
+            }
+        }
+
+        return array_values(array_unique($normalized));
     }
 }
 
