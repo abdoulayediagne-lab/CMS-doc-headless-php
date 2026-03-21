@@ -5,11 +5,23 @@ namespace App\Controllers\Auth;
 use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
+use App\Lib\Security\AuthGuard;
 use App\Lib\Security\JwtService;
 use App\Repositories\UserRepository;
 
 class PostRegisterController extends AbstractController {
     public function process(Request $request): Response {
+        $userRepository = new UserRepository();
+
+        // Bootstrap rule: first account can be created without admin token.
+        if ($userRepository->countUsers() > 0) {
+            $authGuard = new AuthGuard();
+            $authorizedUser = $authGuard->authorize($request, ['admin']);
+            if ($authorizedUser instanceof Response) {
+                return $authorizedUser;
+            }
+        }
+
         $payload = json_decode($request->getPayload(), true);
 
         if (!is_array($payload) || empty($payload['username']) || empty($payload['email']) || empty($payload['password'])) {
@@ -39,8 +51,6 @@ class PostRegisterController extends AbstractController {
                 ['Content-Type' => 'application/json']
             );
         }
-
-        $userRepository = new UserRepository();
 
         if ($userRepository->findByEmail($email) !== null) {
             return new Response(

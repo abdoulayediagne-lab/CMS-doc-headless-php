@@ -5,16 +5,14 @@ namespace App\Controllers\Auth;
 use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
+use App\Lib\Security\AuthGuard;
 
 class PostLogoutController extends AbstractController {
     public function process(Request $request): Response {
-        $token = $request->getBearerToken();
-        if ($token === null || $token === '') {
-            return new Response(
-                json_encode(['error' => 'missing bearer token']),
-                401,
-                ['Content-Type' => 'application/json']
-            );
+        $authGuard = new AuthGuard();
+        $user = $authGuard->authorize($request);
+        if ($user instanceof Response) {
+            return $user;
         }
 
         // Stateless JWT logout: client must discard token.
