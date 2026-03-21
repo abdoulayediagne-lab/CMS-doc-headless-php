@@ -28,5 +28,30 @@
     "path": "/test",
     "method": "GET",
     "controller": "TestController"
+  },
+  {
+    "path": "/documents",
+    "method": "GET",
+    "controller": "Document\\GetDocumentsController"
+  },
+  {
+    "path": "/documents/:id",
+    "method": "GET",
+    "controller": "Document\\GetDocumentController"
+  },
+  {
+    "path": "/documents",
+    "method": "POST",
+    "controller": "Document\\PostDocumentController"
+  },
+  {
+    "path": "/documents/:id",
+    "method": "PUT",
+    "controller": "Document\\PutDocumentController"
+  },
+  {
+    "path": "/documents/:id",
+    "method": "DELETE",
+    "controller": "Document\\DeleteDocumentController"
   }
 ]
