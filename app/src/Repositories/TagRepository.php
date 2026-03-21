@@ -95,6 +95,19 @@ class TagRepository extends AbstractRepository {
 
         return $statement->execute(['id' => $id]);
     }
+    public function findAllWithPublishedCount(): array {
+        $query = 'SELECT t.id, t.name, t.slug, COUNT(dt.document_id) AS document_count
+                  FROM tags t
+                  LEFT JOIN document_tags dt ON dt.tag_id = t.id
+                  LEFT JOIN documents d ON d.id = dt.document_id AND d.status = :status
+                  GROUP BY t.id, t.name, t.slug
+                  ORDER BY t.name ASC';
+ 
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute(['status' => 'published']);
+ 
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }
 
 ?>
