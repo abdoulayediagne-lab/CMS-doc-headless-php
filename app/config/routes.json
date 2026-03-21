@@ -63,5 +63,10 @@
     "path": "/public/documents/:slug",
     "method": "GET",
     "controller": "PublicDocument\\GetPublicDocumentController"
+  },
+  {
+    "path": "/admin/audit-logs",
+    "method": "GET",
+    "controller": "Admin\\GetAuditLogsController"
   }
 ]

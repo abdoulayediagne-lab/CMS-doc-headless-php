@@ -6,6 +6,7 @@ use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
+use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
 
 class PostDocumentController extends AbstractController {
@@ -78,6 +79,20 @@ class PostDocumentController extends AbstractController {
 
         $tagsByDocumentId = $documentRepository->findTagsForDocumentIds([$document->getId()]);
         $tags = $tagsByDocumentId[$document->getId()] ?? [];
+
+        $auditLogRepository = new AuditLogRepository();
+        $auditLogRepository->logAction(
+            $user->getId(),
+            'create',
+            'document',
+            $document->getId(),
+            null,
+            [
+                'title' => $document->getTitle(),
+                'status' => $document->getStatus(),
+                'tags' => $tags,
+            ]
+        );
 
         return new Response(
             json_encode([

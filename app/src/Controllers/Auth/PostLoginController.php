@@ -6,6 +6,7 @@ use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
 use App\Lib\Security\JwtService;
+use App\Repositories\AuditLogRepository;
 use App\Repositories\UserRepository;
 
 class PostLoginController extends AbstractController {
@@ -45,6 +46,16 @@ class PostLoginController extends AbstractController {
             'email' => $user->getEmail(),
             'role' => $user->getRole(),
         ]);
+
+        $auditLogRepository = new AuditLogRepository();
+        $auditLogRepository->logAction(
+            $user->getId(),
+            'login',
+            'user',
+            $user->getId(),
+            null,
+            ['email' => $user->getEmail()]
+        );
 
         return new Response(
             json_encode([

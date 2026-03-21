@@ -6,6 +6,7 @@ use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
+use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
 
 class PutDocumentController extends AbstractController {
@@ -37,6 +38,16 @@ class PutDocumentController extends AbstractController {
                 ['Content-Type' => 'application/json']
             );
         }
+
+        $oldValues = [
+            'title' => $document->title,
+            'slug' => $document->slug,
+            'status' => $document->status,
+            'section_id' => $document->section_id,
+            'meta_title' => $document->meta_title,
+            'meta_description' => $document->meta_description,
+            'sort_order' => $document->sort_order,
+        ];
 
         // Un editor ne peut modifier que ses propres documents
         if ($user->getRole() === 'editor' && $document->author_id !== $user->getId()) {
@@ -107,6 +118,25 @@ class PutDocumentController extends AbstractController {
 
         $tagsByDocumentId = $documentRepository->findTagsForDocumentIds([$updated->getId()]);
         $tags = $tagsByDocumentId[$updated->getId()] ?? [];
+
+        $auditLogRepository = new AuditLogRepository();
+        $auditLogRepository->logAction(
+            $user->getId(),
+            'update',
+            'document',
+            $updated->getId(),
+            $oldValues,
+            [
+                'title' => $updated->title,
+                'slug' => $updated->slug,
+                'status' => $updated->status,
+                'section_id' => $updated->section_id,
+                'meta_title' => $updated->meta_title,
+                'meta_description' => $updated->meta_description,
+                'sort_order' => $updated->sort_order,
+                'tags' => $tags,
+            ]
+        );
 
         return new Response(
             json_encode([
