@@ -75,6 +75,16 @@
     "controller": "PublicDocument\\GetPublicDocumentController"
   },
   {
+    "path": "/public/sections",
+    "method": "GET",
+    "controller": "PublicDocument\\GetPublicSectionsController"
+  },
+  {
+    "path": "/public/tags",
+    "method": "GET",
+    "controller": "PublicDocument\\GetPublicTagsController"
+  },
+  {
     "path": "/admin/audit-logs",
     "method": "GET",
     "controller": "Admin\\GetAuditLogsController"
