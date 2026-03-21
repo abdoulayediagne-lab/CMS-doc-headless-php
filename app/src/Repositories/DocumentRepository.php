@@ -183,6 +183,70 @@ class DocumentRepository extends AbstractRepository {
         return (int) $statement->fetchColumn();
     }
 
+    public function findPublicPaginated(int $limit = 20, int $offset = 0, ?int $sectionId = null, ?string $tagSlug = null, ?string $search = null): array {
+        $query = 'SELECT DISTINCT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
+        $params = ['status' => 'published'];
+        $whereClauses = ['d.status = :status'];
+
+        if ($tagSlug !== null) {
+            $query .= ' INNER JOIN document_tags dt ON dt.document_id = d.id INNER JOIN tags t ON t.id = dt.tag_id';
+            $whereClauses[] = 't.slug = :tag_slug';
+            $params['tag_slug'] = $tagSlug;
+        }
+
+        if ($sectionId !== null) {
+            $whereClauses[] = 'd.section_id = :section_id';
+            $params['section_id'] = $sectionId;
+        }
+
+        if ($search !== null && $search !== '') {
+            $whereClauses[] = '(d.title ILIKE :search OR d.content ILIKE :search)';
+            $params['search'] = '%' . $search . '%';
+        }
+
+        $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        $query .= ' ORDER BY d.published_at DESC NULLS LAST, d.created_at DESC LIMIT :limit OFFSET :offset';
+
+        $statement = $this->db->getConnexion()->prepare($query);
+        foreach ($params as $key => $value) {
+            $statement->bindValue(':' . $key, $value);
+        }
+        $statement->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $statement->bindValue(':offset', $offset, \PDO::PARAM_INT);
+
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function countPublic(?int $sectionId = null, ?string $tagSlug = null, ?string $search = null): int {
+        $query = 'SELECT COUNT(DISTINCT d.id) FROM documents d';
+        $params = ['status' => 'published'];
+        $whereClauses = ['d.status = :status'];
+
+        if ($tagSlug !== null) {
+            $query .= ' INNER JOIN document_tags dt ON dt.document_id = d.id INNER JOIN tags t ON t.id = dt.tag_id';
+            $whereClauses[] = 't.slug = :tag_slug';
+            $params['tag_slug'] = $tagSlug;
+        }
+
+        if ($sectionId !== null) {
+            $whereClauses[] = 'd.section_id = :section_id';
+            $params['section_id'] = $sectionId;
+        }
+
+        if ($search !== null && $search !== '') {
+            $whereClauses[] = '(d.title ILIKE :search OR d.content ILIKE :search)';
+            $params['search'] = '%' . $search . '%';
+        }
+
+        $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute($params);
+
+        return (int) $statement->fetchColumn();
+    }
+
     public function findTagsForDocumentIds(array $documentIds): array {
         if (empty($documentIds)) {
             return [];
