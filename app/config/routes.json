@@ -10,6 +10,16 @@
     "controller": "Auth\\PostLoginController"
   },
   {
+    "path": "/auth/refresh",
+    "method": "POST",
+    "controller": "Auth\\PostRefreshController"
+  },
+  {
+    "path": "/auth/logout",
+    "method": "POST",
+    "controller": "Auth\\PostLogoutController"
+  },
+  {
     "path": "/me",
     "method": "GET",
     "controller": "Auth\\GetMeController"
