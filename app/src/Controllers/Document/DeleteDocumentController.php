@@ -11,9 +11,9 @@ use App\Repositories\DocumentRepository;
 class DeleteDocumentController extends AbstractController {
 
     public function process(Request $request): Response {
-        // Seuls admin et editor peuvent supprimer
+        // Seuls admin peuvent supprimer
         $authGuard = new AuthGuard();
-        $user = $authGuard->authorize($request, ['admin', 'editor']);
+        $user = $authGuard->authorize($request, ['admin']);
         if ($user instanceof Response) {
             return $user;
         }

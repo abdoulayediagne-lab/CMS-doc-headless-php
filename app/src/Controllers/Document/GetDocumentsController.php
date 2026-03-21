@@ -19,20 +19,33 @@ class GetDocumentsController extends AbstractController {
 
         $documentRepository = new DocumentRepository();
 
-        // Pagination par query string : ?page=1&limit=20&status=published
-        $page = max(1, (int) ($_GET['page'] ?? 1));
-        $limit = min(100, max(1, (int) ($_GET['limit'] ?? 20)));
-        $offset = ($page - 1) * $limit;
-        $status = $_GET['status'] ?? null;
+        $queryParams = $request->getUrlParams();
 
-        // Seuls les admins et éditeurs voient tous les statuts
-        // Les auteurs ne voient que leurs propres brouillons + tous les publiés
-        if (!in_array($user->getRole(), ['admin', 'editor'])) {
-            $status = 'published';
+        // Pagination par query string : ?page=1&limit=20&status=published
+        $page = max(1, (int) ($queryParams['page'] ?? 1));
+        $limit = min(100, max(1, (int) ($queryParams['limit'] ?? 20)));
+        $offset = ($page - 1) * $limit;
+        $status = isset($queryParams['status']) ? trim((string) $queryParams['status']) : null;
+
+        $allowedStatuses = ['draft', 'review', 'published', 'archived'];
+        if ($status !== null && !in_array($status, $allowedStatuses, true)) {
+            return new Response(
+                json_encode(['error' => 'invalid status filter']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
         }
 
-        $documents = $documentRepository->findAllPaginated($limit, $offset, $status);
-        $total = $documentRepository->countAll($status);
+        if ($user->getRole() === 'admin') {
+            $documents = $documentRepository->findAllPaginated($limit, $offset, $status);
+            $total = $documentRepository->countAll($status);
+        } elseif ($user->getRole() === 'editor') {
+            $documents = $documentRepository->findVisibleForEditor($user->getId(), $limit, $offset, $status);
+            $total = $documentRepository->countVisibleForEditor($user->getId(), $status);
+        } else {
+            $documents = $documentRepository->findAllPaginated($limit, $offset, 'published');
+            $total = $documentRepository->countAll('published');
+        }
 
         return new Response(
             json_encode([

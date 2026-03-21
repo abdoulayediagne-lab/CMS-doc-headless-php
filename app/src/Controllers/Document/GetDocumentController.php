@@ -37,13 +37,15 @@ class GetDocumentController extends AbstractController {
             );
         }
 
-        // Les lecteurs/auteurs ne peuvent voir que les documents publiés (sauf les leurs)
-        if (!in_array($user->getRole(), ['admin', 'editor']) && !$document->isPublished() && $document->author_id !== $user->getId()) {
-            return new Response(
-                json_encode(['error' => 'document not found']),
-                404,
-                ['Content-Type' => 'application/json']
-            );
+        if ($user->getRole() !== 'admin') {
+            $isEditorOwner = $user->getRole() === 'editor' && $document->author_id === $user->getId();
+            if (!$document->isPublished() && !$isEditorOwner) {
+                return new Response(
+                    json_encode(['error' => 'document not found']),
+                    404,
+                    ['Content-Type' => 'application/json']
+                );
+            }
         }
 
         return new Response(

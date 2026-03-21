@@ -11,9 +11,9 @@ use App\Repositories\DocumentRepository;
 class PutDocumentController extends AbstractController {
 
     public function process(Request $request): Response {
-        // Seuls admin, editor et author peuvent modifier
+        // Seuls admin et editor peuvent modifier
         $authGuard = new AuthGuard();
-        $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
+        $user = $authGuard->authorize($request, ['admin', 'editor']);
         if ($user instanceof Response) {
             return $user;
         }
@@ -38,8 +38,8 @@ class PutDocumentController extends AbstractController {
             );
         }
 
-        // Un auteur ne peut modifier que ses propres documents
-        if ($user->getRole() === 'author' && $document->author_id !== $user->getId()) {
+        // Un editor ne peut modifier que ses propres documents
+        if ($user->getRole() === 'editor' && $document->author_id !== $user->getId()) {
             return new Response(
                 json_encode(['error' => 'forbidden: you can only edit your own documents']),
                 403,
@@ -56,6 +56,17 @@ class PutDocumentController extends AbstractController {
             );
         }
 
+        if (isset($payload['status'])) {
+            $allowedStatuses = ['draft', 'review', 'published', 'archived'];
+            if (!in_array($payload['status'], $allowedStatuses, true)) {
+                return new Response(
+                    json_encode(['error' => 'invalid status']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+        }
+
         // Si le slug change, vérifier l'unicité
         if (isset($payload['slug']) && $payload['slug'] !== $document->getSlug()) {
             if ($documentRepository->findBySlug($payload['slug']) !== null) {
@@ -70,6 +81,8 @@ class PutDocumentController extends AbstractController {
         // Gérer la publication (mettre published_at si le statut passe à published)
         if (isset($payload['status']) && $payload['status'] === 'published' && !$document->isPublished()) {
             $payload['published_at'] = date('Y-m-d H:i:s');
+        } elseif (isset($payload['status']) && $payload['status'] !== 'published') {
+            $payload['published_at'] = null;
         }
 
         $updated = $documentRepository->updateDocument($id, $payload);

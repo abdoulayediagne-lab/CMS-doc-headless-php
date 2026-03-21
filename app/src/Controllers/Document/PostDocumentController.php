@@ -11,9 +11,9 @@ use App\Repositories\DocumentRepository;
 class PostDocumentController extends AbstractController {
 
     public function process(Request $request): Response {
-        // Seuls admin, editor et author peuvent créer des documents
+        // Seuls admin et editor peuvent créer des documents
         $authGuard = new AuthGuard();
-        $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
+        $user = $authGuard->authorize($request, ['admin', 'editor']);
         if ($user instanceof Response) {
             return $user;
         }
@@ -30,6 +30,16 @@ class PostDocumentController extends AbstractController {
 
         $title = trim((string) $payload['title']);
         $slug = $payload['slug'] ?? $this->generateSlug($title);
+        $status = $payload['status'] ?? 'draft';
+
+        $allowedStatuses = ['draft', 'review', 'published', 'archived'];
+        if (!in_array($status, $allowedStatuses, true)) {
+            return new Response(
+                json_encode(['error' => 'invalid status']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
 
         // Vérifier l'unicité du slug
         $documentRepository = new DocumentRepository();
@@ -45,7 +55,7 @@ class PostDocumentController extends AbstractController {
             'title' => $title,
             'slug' => $slug,
             'content' => $payload['content'] ?? '',
-            'status' => $payload['status'] ?? 'draft',
+            'status' => $status,
             'section_id' => $payload['section_id'] ?? null,
             'author_id' => $user->getId(),
             'meta_title' => $payload['meta_title'] ?? null,

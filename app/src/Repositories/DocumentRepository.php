@@ -45,10 +45,38 @@ class DocumentRepository extends AbstractRepository {
         $statement = $this->db->getConnexion()->prepare($query);
 
         foreach ($params as $key => $value) {
-            $statement->bindValue($key, $value);
+            $statement->bindValue(':' . $key, $value);
         }
-        $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
-        $statement->bindValue('offset', $offset, \PDO::PARAM_INT);
+        $statement->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $statement->bindValue(':offset', $offset, \PDO::PARAM_INT);
+
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function findVisibleForEditor(int $editorId, int $limit = 20, int $offset = 0, ?string $status = null): array {
+        $query = 'SELECT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
+        $params = ['editor_id' => $editorId];
+
+        if ($status === null) {
+            $query .= ' WHERE (d.status = :published_status OR d.author_id = :editor_id)';
+            $params['published_status'] = 'published';
+        } elseif ($status === 'published') {
+            $query .= ' WHERE d.status = :status';
+            $params['status'] = 'published';
+        } else {
+            $query .= ' WHERE d.status = :status AND d.author_id = :editor_id';
+            $params['status'] = $status;
+        }
+
+        $query .= ' ORDER BY d.created_at DESC LIMIT :limit OFFSET :offset';
+
+        $statement = $this->db->getConnexion()->prepare($query);
+        foreach ($params as $key => $value) {
+            $statement->bindValue(':' . $key, $value);
+        }
+        $statement->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $statement->bindValue(':offset', $offset, \PDO::PARAM_INT);
 
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
@@ -65,6 +93,27 @@ class DocumentRepository extends AbstractRepository {
 
         $statement = $this->db->getConnexion()->prepare($query);
         $statement->execute($params);
+        return (int) $statement->fetchColumn();
+    }
+
+    public function countVisibleForEditor(int $editorId, ?string $status = null): int {
+        $query = 'SELECT COUNT(*) FROM documents d';
+        $params = ['editor_id' => $editorId];
+
+        if ($status === null) {
+            $query .= ' WHERE (d.status = :published_status OR d.author_id = :editor_id)';
+            $params['published_status'] = 'published';
+        } elseif ($status === 'published') {
+            $query .= ' WHERE d.status = :status';
+            $params['status'] = 'published';
+        } else {
+            $query .= ' WHERE d.status = :status AND d.author_id = :editor_id';
+            $params['status'] = $status;
+        }
+
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute($params);
+
         return (int) $statement->fetchColumn();
     }
 
