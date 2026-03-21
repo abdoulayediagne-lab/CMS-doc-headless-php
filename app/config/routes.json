@@ -138,5 +138,20 @@
     "path": "/admin/sections/:id",
     "method": "DELETE",
     "controller": "Admin\\DeleteSectionController"
+  },
+  {
+    "path": "/sitemap.xml",
+    "method": "GET",
+    "controller": "PublicDocument\\GetSitemapController"
+  },
+  {
+    "path": "/robots.txt",
+    "method": "GET",
+    "controller": "PublicDocument\\GetRobotsController"
+  },
+  {
+    "path": "/public/taxonomies",
+    "method": "GET",
+    "controller": "PublicDocument\\GetPublicTaxonomiesController"
   }
 ]
