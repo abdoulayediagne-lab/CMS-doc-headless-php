@@ -31,6 +31,26 @@ class UserRepository extends AbstractRepository {
 
         return $user === false ? null : $user;
     }
+
+    public function create(string $username, string $email, string $plainPassword): ?User {
+        $passwordHash = password_hash($plainPassword, PASSWORD_BCRYPT);
+
+        $query = 'INSERT INTO users (username, email, password_hash, role, is_active) VALUES (:username, :email, :password_hash, :role, :is_active)';
+        $statement = $this->db->getConnexion()->prepare($query);
+        $created = $statement->execute([
+            'username' => $username,
+            'email' => $email,
+            'password_hash' => $passwordHash,
+            'role' => 'reader',
+            'is_active' => true,
+        ]);
+
+        if ($created === false) {
+            return null;
+        }
+
+        return $this->findByEmail($email);
+    }
 }
 
 ?>
