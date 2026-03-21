@@ -68,5 +68,55 @@
     "path": "/admin/audit-logs",
     "method": "GET",
     "controller": "Admin\\GetAuditLogsController"
+  },
+  {
+    "path": "/admin/users",
+    "method": "GET",
+    "controller": "Admin\\GetUsersController"
+  },
+  {
+    "path": "/admin/users/:id",
+    "method": "PATCH",
+    "controller": "Admin\\PatchUserController"
+  },
+  {
+    "path": "/admin/tags",
+    "method": "GET",
+    "controller": "Admin\\GetTagsController"
+  },
+  {
+    "path": "/admin/tags",
+    "method": "POST",
+    "controller": "Admin\\PostTagController"
+  },
+  {
+    "path": "/admin/tags/:id",
+    "method": "PATCH",
+    "controller": "Admin\\PatchTagController"
+  },
+  {
+    "path": "/admin/tags/:id",
+    "method": "DELETE",
+    "controller": "Admin\\DeleteTagController"
+  },
+  {
+    "path": "/admin/sections",
+    "method": "GET",
+    "controller": "Admin\\GetSectionsController"
+  },
+  {
+    "path": "/admin/sections",
+    "method": "POST",
+    "controller": "Admin\\PostSectionController"
+  },
+  {
+    "path": "/admin/sections/:id",
+    "method": "PATCH",
+    "controller": "Admin\\PatchSectionController"
+  },
+  {
+    "path": "/admin/sections/:id",
+    "method": "DELETE",
+    "controller": "Admin\\DeleteSectionController"
   }
 ]

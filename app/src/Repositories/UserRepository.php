@@ -59,6 +59,42 @@ class UserRepository extends AbstractRepository {
 
         return (int) $statement->fetchColumn();
     }
+
+    public function findAllPaginated(int $limit = 50, int $offset = 0): array {
+        $query = 'SELECT id, username, email, role, is_active, created_at, updated_at FROM users ORDER BY created_at DESC LIMIT :limit OFFSET :offset';
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $statement->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function updateAdminFields(int $id, ?string $role = null, ?bool $isActive = null): ?User {
+        $setClauses = [];
+        $params = ['id' => $id];
+
+        if ($role !== null) {
+            $setClauses[] = 'role = :role';
+            $params['role'] = $role;
+        }
+
+        if ($isActive !== null) {
+            $setClauses[] = 'is_active = :is_active';
+            $params['is_active'] = $isActive;
+        }
+
+        if (empty($setClauses)) {
+            return $this->findById($id);
+        }
+
+        $setClauses[] = 'updated_at = NOW()';
+        $query = 'UPDATE users SET ' . implode(', ', $setClauses) . ' WHERE id = :id';
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute($params);
+
+        return $this->findById($id);
+    }
 }
 
 ?>
