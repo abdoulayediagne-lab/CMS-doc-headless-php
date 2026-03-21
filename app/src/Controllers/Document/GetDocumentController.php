@@ -48,6 +48,9 @@ class GetDocumentController extends AbstractController {
             }
         }
 
+        $tagsByDocumentId = $documentRepository->findTagsForDocumentIds([$document->getId()]);
+        $tags = $tagsByDocumentId[$document->getId()] ?? [];
+
         return new Response(
             json_encode([
                 'id' => $document->getId(),
@@ -56,6 +59,7 @@ class GetDocumentController extends AbstractController {
                 'content' => $document->content,
                 'status' => $document->getStatus(),
                 'section_id' => $document->section_id,
+                'tags' => $tags,
                 'author_id' => $document->author_id,
                 'meta_title' => $document->meta_title,
                 'meta_description' => $document->meta_description,

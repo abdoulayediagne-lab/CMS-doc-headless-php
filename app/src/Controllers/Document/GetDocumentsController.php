@@ -26,6 +26,8 @@ class GetDocumentsController extends AbstractController {
         $limit = min(100, max(1, (int) ($queryParams['limit'] ?? 20)));
         $offset = ($page - 1) * $limit;
         $status = isset($queryParams['status']) ? trim((string) $queryParams['status']) : null;
+        $sectionId = isset($queryParams['section_id']) ? (int) $queryParams['section_id'] : null;
+        $tagSlug = isset($queryParams['tag']) ? trim((string) $queryParams['tag']) : null;
 
         $allowedStatuses = ['draft', 'review', 'published', 'archived'];
         if ($status !== null && !in_array($status, $allowedStatuses, true)) {
@@ -36,16 +38,39 @@ class GetDocumentsController extends AbstractController {
             );
         }
 
-        if ($user->getRole() === 'admin') {
-            $documents = $documentRepository->findAllPaginated($limit, $offset, $status);
-            $total = $documentRepository->countAll($status);
-        } elseif ($user->getRole() === 'editor') {
-            $documents = $documentRepository->findVisibleForEditor($user->getId(), $limit, $offset, $status);
-            $total = $documentRepository->countVisibleForEditor($user->getId(), $status);
-        } else {
-            $documents = $documentRepository->findAllPaginated($limit, $offset, 'published');
-            $total = $documentRepository->countAll('published');
+        if ($sectionId !== null && $sectionId <= 0) {
+            return new Response(
+                json_encode(['error' => 'invalid section_id filter']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
         }
+
+        if ($tagSlug !== null && $tagSlug === '') {
+            return new Response(
+                json_encode(['error' => 'invalid tag filter']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
+        if ($user->getRole() === 'admin') {
+            $documents = $documentRepository->findAllPaginated($limit, $offset, $status, $sectionId, $tagSlug);
+            $total = $documentRepository->countAll($status, $sectionId, $tagSlug);
+        } elseif ($user->getRole() === 'editor') {
+            $documents = $documentRepository->findVisibleForEditor($user->getId(), $limit, $offset, $status, $sectionId, $tagSlug);
+            $total = $documentRepository->countVisibleForEditor($user->getId(), $status, $sectionId, $tagSlug);
+        } else {
+            $documents = $documentRepository->findAllPaginated($limit, $offset, 'published', $sectionId, $tagSlug);
+            $total = $documentRepository->countAll('published', $sectionId, $tagSlug);
+        }
+
+        $documentIds = array_map(static fn(array $doc): int => (int) $doc['id'], $documents);
+        $tagsByDocumentId = $documentRepository->findTagsForDocumentIds($documentIds);
+        foreach ($documents as &$doc) {
+            $doc['tags'] = $tagsByDocumentId[(int) $doc['id']] ?? [];
+        }
+        unset($doc);
 
         return new Response(
             json_encode([
@@ -55,6 +80,11 @@ class GetDocumentsController extends AbstractController {
                     'limit' => $limit,
                     'total' => $total,
                     'total_pages' => (int) ceil($total / $limit),
+                ],
+                'filters' => [
+                    'status' => $status,
+                    'section_id' => $sectionId,
+                    'tag' => $tagSlug,
                 ],
             ]),
             200,

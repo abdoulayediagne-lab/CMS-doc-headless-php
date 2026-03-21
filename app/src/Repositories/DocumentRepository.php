@@ -31,13 +31,29 @@ class DocumentRepository extends AbstractRepository {
         return $doc === false ? null : $doc;
     }
 
-    public function findAllPaginated(int $limit = 20, int $offset = 0, ?string $status = null): array {
-        $query = 'SELECT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
+    public function findAllPaginated(int $limit = 20, int $offset = 0, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null): array {
+        $query = 'SELECT DISTINCT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
         $params = [];
+        $whereClauses = [];
+
+        if ($tagSlug !== null) {
+            $query .= ' INNER JOIN document_tags dt ON dt.document_id = d.id INNER JOIN tags t ON t.id = dt.tag_id';
+            $whereClauses[] = 't.slug = :tag_slug';
+            $params['tag_slug'] = $tagSlug;
+        }
 
         if ($status !== null) {
-            $query .= ' WHERE d.status = :status';
+            $whereClauses[] = 'd.status = :status';
             $params['status'] = $status;
+        }
+
+        if ($sectionId !== null) {
+            $whereClauses[] = 'd.section_id = :section_id';
+            $params['section_id'] = $sectionId;
+        }
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
         }
 
         $query .= ' ORDER BY d.created_at DESC LIMIT :limit OFFSET :offset';
@@ -54,19 +70,36 @@ class DocumentRepository extends AbstractRepository {
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function findVisibleForEditor(int $editorId, int $limit = 20, int $offset = 0, ?string $status = null): array {
-        $query = 'SELECT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
+    public function findVisibleForEditor(int $editorId, int $limit = 20, int $offset = 0, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null): array {
+        $query = 'SELECT DISTINCT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
         $params = ['editor_id' => $editorId];
+        $whereClauses = [];
+
+        if ($tagSlug !== null) {
+            $query .= ' INNER JOIN document_tags dt ON dt.document_id = d.id INNER JOIN tags t ON t.id = dt.tag_id';
+            $whereClauses[] = 't.slug = :tag_slug';
+            $params['tag_slug'] = $tagSlug;
+        }
 
         if ($status === null) {
-            $query .= ' WHERE (d.status = :published_status OR d.author_id = :editor_id)';
+            $whereClauses[] = '(d.status = :published_status OR d.author_id = :editor_id)';
             $params['published_status'] = 'published';
         } elseif ($status === 'published') {
-            $query .= ' WHERE d.status = :status';
+            $whereClauses[] = 'd.status = :status';
             $params['status'] = 'published';
         } else {
-            $query .= ' WHERE d.status = :status AND d.author_id = :editor_id';
+            $whereClauses[] = 'd.status = :status';
+            $whereClauses[] = 'd.author_id = :editor_id';
             $params['status'] = $status;
+        }
+
+        if ($sectionId !== null) {
+            $whereClauses[] = 'd.section_id = :section_id';
+            $params['section_id'] = $sectionId;
+        }
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
         }
 
         $query .= ' ORDER BY d.created_at DESC LIMIT :limit OFFSET :offset';
@@ -82,13 +115,29 @@ class DocumentRepository extends AbstractRepository {
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function countAll(?string $status = null): int {
-        $query = 'SELECT COUNT(*) FROM documents';
+    public function countAll(?string $status = null, ?int $sectionId = null, ?string $tagSlug = null): int {
+        $query = 'SELECT COUNT(DISTINCT d.id) FROM documents d';
         $params = [];
+        $whereClauses = [];
+
+        if ($tagSlug !== null) {
+            $query .= ' INNER JOIN document_tags dt ON dt.document_id = d.id INNER JOIN tags t ON t.id = dt.tag_id';
+            $whereClauses[] = 't.slug = :tag_slug';
+            $params['tag_slug'] = $tagSlug;
+        }
 
         if ($status !== null) {
-            $query .= ' WHERE status = :status';
+            $whereClauses[] = 'd.status = :status';
             $params['status'] = $status;
+        }
+
+        if ($sectionId !== null) {
+            $whereClauses[] = 'd.section_id = :section_id';
+            $params['section_id'] = $sectionId;
+        }
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
         }
 
         $statement = $this->db->getConnexion()->prepare($query);
@@ -96,25 +145,73 @@ class DocumentRepository extends AbstractRepository {
         return (int) $statement->fetchColumn();
     }
 
-    public function countVisibleForEditor(int $editorId, ?string $status = null): int {
-        $query = 'SELECT COUNT(*) FROM documents d';
+    public function countVisibleForEditor(int $editorId, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null): int {
+        $query = 'SELECT COUNT(DISTINCT d.id) FROM documents d';
         $params = ['editor_id' => $editorId];
+        $whereClauses = [];
+
+        if ($tagSlug !== null) {
+            $query .= ' INNER JOIN document_tags dt ON dt.document_id = d.id INNER JOIN tags t ON t.id = dt.tag_id';
+            $whereClauses[] = 't.slug = :tag_slug';
+            $params['tag_slug'] = $tagSlug;
+        }
 
         if ($status === null) {
-            $query .= ' WHERE (d.status = :published_status OR d.author_id = :editor_id)';
+            $whereClauses[] = '(d.status = :published_status OR d.author_id = :editor_id)';
             $params['published_status'] = 'published';
         } elseif ($status === 'published') {
-            $query .= ' WHERE d.status = :status';
+            $whereClauses[] = 'd.status = :status';
             $params['status'] = 'published';
         } else {
-            $query .= ' WHERE d.status = :status AND d.author_id = :editor_id';
+            $whereClauses[] = 'd.status = :status';
+            $whereClauses[] = 'd.author_id = :editor_id';
             $params['status'] = $status;
+        }
+
+        if ($sectionId !== null) {
+            $whereClauses[] = 'd.section_id = :section_id';
+            $params['section_id'] = $sectionId;
+        }
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
         }
 
         $statement = $this->db->getConnexion()->prepare($query);
         $statement->execute($params);
 
         return (int) $statement->fetchColumn();
+    }
+
+    public function findTagsForDocumentIds(array $documentIds): array {
+        if (empty($documentIds)) {
+            return [];
+        }
+
+        $placeholders = [];
+        $params = [];
+        foreach (array_values($documentIds) as $index => $documentId) {
+            $placeholder = ':doc_' . $index;
+            $placeholders[] = $placeholder;
+            $params['doc_' . $index] = (int) $documentId;
+        }
+
+        $query = 'SELECT dt.document_id, t.slug FROM document_tags dt INNER JOIN tags t ON t.id = dt.tag_id WHERE dt.document_id IN (' . implode(', ', $placeholders) . ') ORDER BY t.slug ASC';
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute($params);
+
+        $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $tagsByDocumentId = [];
+
+        foreach ($rows as $row) {
+            $docId = (int) $row['document_id'];
+            if (!isset($tagsByDocumentId[$docId])) {
+                $tagsByDocumentId[$docId] = [];
+            }
+            $tagsByDocumentId[$docId][] = $row['slug'];
+        }
+
+        return $tagsByDocumentId;
     }
 
     public function create(array $data): ?Document {
