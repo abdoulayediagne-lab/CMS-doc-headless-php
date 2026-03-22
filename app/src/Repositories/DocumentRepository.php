@@ -31,7 +31,7 @@ class DocumentRepository extends AbstractRepository {
         return $doc === false ? null : $doc;
     }
 
-    public function findAllPaginated(int $limit = 20, int $offset = 0, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null): array {
+    public function findAllPaginated(int $limit = 20, int $offset = 0, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null, ?string $search = null): array {
         $query = 'SELECT DISTINCT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
         $params = [];
         $whereClauses = [];
@@ -52,6 +52,11 @@ class DocumentRepository extends AbstractRepository {
             $params['section_id'] = $sectionId;
         }
 
+        if ($search !== null && $search !== '') {
+            $whereClauses[] = '(d.title ILIKE :search OR d.content ILIKE :search)';
+            $params['search'] = '%' . $search . '%';
+        }
+
         if (!empty($whereClauses)) {
             $query .= ' WHERE ' . implode(' AND ', $whereClauses);
         }
@@ -70,7 +75,7 @@ class DocumentRepository extends AbstractRepository {
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function findVisibleForEditor(int $editorId, int $limit = 20, int $offset = 0, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null): array {
+    public function findVisibleForEditor(int $editorId, int $limit = 20, int $offset = 0, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null, ?string $search = null): array {
         $query = 'SELECT DISTINCT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
         $params = ['editor_id' => $editorId];
         $whereClauses = [];
@@ -98,6 +103,11 @@ class DocumentRepository extends AbstractRepository {
             $params['section_id'] = $sectionId;
         }
 
+        if ($search !== null && $search !== '') {
+            $whereClauses[] = '(d.title ILIKE :search OR d.content ILIKE :search)';
+            $params['search'] = '%' . $search . '%';
+        }
+
         if (!empty($whereClauses)) {
             $query .= ' WHERE ' . implode(' AND ', $whereClauses);
         }
@@ -115,7 +125,7 @@ class DocumentRepository extends AbstractRepository {
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function countAll(?string $status = null, ?int $sectionId = null, ?string $tagSlug = null): int {
+    public function countAll(?string $status = null, ?int $sectionId = null, ?string $tagSlug = null, ?string $search = null): int {
         $query = 'SELECT COUNT(DISTINCT d.id) FROM documents d';
         $params = [];
         $whereClauses = [];
@@ -134,6 +144,11 @@ class DocumentRepository extends AbstractRepository {
         if ($sectionId !== null) {
             $whereClauses[] = 'd.section_id = :section_id';
             $params['section_id'] = $sectionId;
+        }
+
+        if ($search !== null && $search !== '') {
+            $whereClauses[] = '(d.title ILIKE :search OR d.content ILIKE :search)';
+            $params['search'] = '%' . $search . '%';
         }
 
         if (!empty($whereClauses)) {
@@ -145,7 +160,7 @@ class DocumentRepository extends AbstractRepository {
         return (int) $statement->fetchColumn();
     }
 
-    public function countVisibleForEditor(int $editorId, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null): int {
+    public function countVisibleForEditor(int $editorId, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null, ?string $search = null): int {
         $query = 'SELECT COUNT(DISTINCT d.id) FROM documents d';
         $params = ['editor_id' => $editorId];
         $whereClauses = [];
@@ -171,6 +186,11 @@ class DocumentRepository extends AbstractRepository {
         if ($sectionId !== null) {
             $whereClauses[] = 'd.section_id = :section_id';
             $params['section_id'] = $sectionId;
+        }
+
+        if ($search !== null && $search !== '') {
+            $whereClauses[] = '(d.title ILIKE :search OR d.content ILIKE :search)';
+            $params['search'] = '%' . $search . '%';
         }
 
         if (!empty($whereClauses)) {
