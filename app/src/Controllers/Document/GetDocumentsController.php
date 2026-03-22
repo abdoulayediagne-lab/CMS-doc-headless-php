@@ -28,6 +28,7 @@ class GetDocumentsController extends AbstractController {
         $status = isset($queryParams['status']) ? trim((string) $queryParams['status']) : null;
         $sectionId = isset($queryParams['section_id']) ? (int) $queryParams['section_id'] : null;
         $tagSlug = isset($queryParams['tag']) ? trim((string) $queryParams['tag']) : null;
+        $search = isset($queryParams['q']) ? trim((string) $queryParams['q']) : null;
 
         $allowedStatuses = ['draft', 'review', 'published', 'archived'];
         if ($status !== null && !in_array($status, $allowedStatuses, true)) {
@@ -55,14 +56,14 @@ class GetDocumentsController extends AbstractController {
         }
 
         if ($user->getRole() === 'admin') {
-            $documents = $documentRepository->findAllPaginated($limit, $offset, $status, $sectionId, $tagSlug);
-            $total = $documentRepository->countAll($status, $sectionId, $tagSlug);
+            $documents = $documentRepository->findAllPaginated($limit, $offset, $status, $sectionId, $tagSlug, $search);
+            $total = $documentRepository->countAll($status, $sectionId, $tagSlug, $search);
         } elseif ($user->getRole() === 'editor') {
-            $documents = $documentRepository->findVisibleForEditor($user->getId(), $limit, $offset, $status, $sectionId, $tagSlug);
-            $total = $documentRepository->countVisibleForEditor($user->getId(), $status, $sectionId, $tagSlug);
+            $documents = $documentRepository->findVisibleForEditor($user->getId(), $limit, $offset, $status, $sectionId, $tagSlug, $search);
+            $total = $documentRepository->countVisibleForEditor($user->getId(), $status, $sectionId, $tagSlug, $search);
         } else {
-            $documents = $documentRepository->findAllPaginated($limit, $offset, 'published', $sectionId, $tagSlug);
-            $total = $documentRepository->countAll('published', $sectionId, $tagSlug);
+            $documents = $documentRepository->findAllPaginated($limit, $offset, 'published', $sectionId, $tagSlug, $search);
+            $total = $documentRepository->countAll('published', $sectionId, $tagSlug, $search);
         }
 
         $documentIds = array_map(static fn(array $doc): int => (int) $doc['id'], $documents);
@@ -85,6 +86,7 @@ class GetDocumentsController extends AbstractController {
                     'status' => $status,
                     'section_id' => $sectionId,
                     'tag' => $tagSlug,
+                    'q' => $search,
                 ],
             ]),
             200,
