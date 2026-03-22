@@ -97,6 +97,35 @@ class SectionRepository extends AbstractRepository {
 
         return $statement->execute(['id' => $id]);
     }
+    public function findAllFlat(): array {
+        $query = 'SELECT * FROM sections ORDER BY sort_order ASC, name ASC';
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function findByParentId(?int $parentId): array {
+        if ($parentId === null) {
+            $query = 'SELECT * FROM sections WHERE parent_id IS NULL ORDER BY sort_order ASC, name ASC';
+            $statement = $this->db->getConnexion()->prepare($query);
+            $statement->execute();
+        } else {
+            $query = 'SELECT * FROM sections WHERE parent_id = :parent_id ORDER BY sort_order ASC, name ASC';
+            $statement = $this->db->getConnexion()->prepare($query);
+            $statement->execute(['parent_id' => $parentId]);
+        }
+
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function countDocumentsInSection(int $sectionId): int {
+        $query = 'SELECT COUNT(*) FROM documents WHERE section_id = :section_id AND status = :status';
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute(['section_id' => $sectionId, 'status' => 'published']);
+
+        return (int) $statement->fetchColumn();
+    }
 }
 
 ?>
