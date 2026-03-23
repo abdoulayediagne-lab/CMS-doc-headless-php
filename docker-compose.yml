@@ -19,12 +19,7 @@ services:
     working_dir: /workspace
     volumes:
       - ./:/workspace
-    command: >
-      sh -c "npm install -g sass &&
-      mkdir -p /workspace/front/public /workspace/front/backoffice &&
-      sass --watch --no-source-map /workspace/sass/main.scss:/workspace/front/public/main.css &
-      sass --watch --no-source-map /workspace/sass/main.scss:/workspace/front/backoffice/main.css &
-      wait"
+    command: sh /workspace/scripts/sass-watch.sh
 
   public-front:
     image: nginx:alpine
