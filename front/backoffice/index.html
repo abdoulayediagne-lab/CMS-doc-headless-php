@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CMS Documentation - Backoffice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" />
+    <link rel="stylesheet" href="./main.css" />
+  </head>
+  <body>
+    <header class="navbar" role="banner">
+      <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="navbar__brand">Backoffice CMS</div>
+        <button id="logout-btn" class="btn btn--outline" type="button">Se deconnecter</button>
+      </div>
+    </header>
+
+    <main class="container" role="main" aria-label="Backoffice" style="padding-top: 1.5rem; padding-bottom: 2rem;">
+      <section class="card" aria-labelledby="login-title" style="margin-bottom: 1rem;">
+        <div class="card__header">
+          <h1 id="login-title" class="card__title">Connexion</h1>
+        </div>
+        <div class="card__body">
+          <form id="login-form" class="form" novalidate>
+            <div class="form__group">
+              <label class="form__label" for="email">Email</label>
+              <input class="form__input" id="email" name="email" type="email" required />
+            </div>
+            <div class="form__group">
+              <label class="form__label" for="password">Mot de passe</label>
+              <input class="form__input" id="password" name="password" type="password" required minlength="8" />
+            </div>
+            <button class="btn btn--primary" type="submit">Se connecter</button>
+          </form>
+          <div id="auth-status" class="alert alert--info" role="status" aria-live="polite" style="margin-top: 1rem;">Non connecte.</div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="users-title">
+        <div class="card__header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h2 id="users-title" class="card__title">Utilisateurs (admin)</h2>
+          <button id="load-users-btn" class="btn btn--secondary" type="button">Charger</button>
+        </div>
+        <div class="card__body">
+          <div id="users-status" class="alert alert--info" role="status" aria-live="polite">Connecte-toi en admin pour lister les utilisateurs.</div>
+          <div class="table-responsive">
+            <table class="table" aria-label="Liste des utilisateurs">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Active</th>
+                </tr>
+              </thead>
+              <tbody id="users-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      <div class="container">CMS headless - Backoffice</div>
+    </footer>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
