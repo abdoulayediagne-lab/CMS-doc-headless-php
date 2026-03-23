@@ -13,6 +13,43 @@ services:
     depends_on:
       - php-framework-db
 
+  sass-builder:
+    image: node:22-alpine
+    container_name: cms-sass-builder
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: >
+      sh -c "npm install -g sass &&
+      mkdir -p /workspace/front/public /workspace/front/backoffice &&
+      sass --watch --no-source-map
+      /workspace/sass/main.scss:/workspace/front/public/main.css
+      /workspace/sass/main.scss:/workspace/front/backoffice/main.css"
+
+  public-front:
+    image: nginx:alpine
+    container_name: cms-public-front
+    restart: unless-stopped
+    volumes:
+      - ./front/public:/usr/share/nginx/html:ro
+    ports:
+      - "5173:80"
+    depends_on:
+      - php-framework-php
+      - sass-builder
+
+  backoffice-front:
+    image: nginx:alpine
+    container_name: cms-backoffice-front
+    restart: unless-stopped
+    volumes:
+      - ./front/backoffice:/usr/share/nginx/html:ro
+    ports:
+      - "5174:80"
+    depends_on:
+      - php-framework-php
+      - sass-builder
+
   php-framework-db:
     image: postgres:18
     container_name: php-framework-postgres
