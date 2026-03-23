@@ -3,3 +3,5 @@ pgdata/
 mysql/
 log/
 AGENT.md
+front/public/main.css
+front/backoffice/main.css
