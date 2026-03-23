@@ -1,0 +1,55 @@
+// ============================================
+// Table (BEM)
+// .table, .table__header, .table__row
+// ============================================
+
+.table {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+
+  &__header {
+    background-color: var(--color-bg-secondary);
+
+    th {
+      padding: $spacing-md $spacing-lg;
+      text-align: left;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: var(--color-text-secondary);
+      border-bottom: 1px solid var(--color-border);
+    }
+  }
+
+  &__row {
+    border-bottom: 1px solid var(--color-border);
+    @include transition(background-color);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: var(--color-bg-secondary);
+    }
+
+    td {
+      padding: $spacing-md $spacing-lg;
+      font-size: $font-size-sm;
+      color: var(--color-text);
+    }
+  }
+
+  &--striped {
+    .table__row:nth-child(even) {
+      background-color: var(--color-bg-secondary);
+    }
+  }
+
+  // Responsive : scroll horizontal sur mobile
+  &-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

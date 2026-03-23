@@ -1,0 +1,82 @@
+// ============================================
+// Modal (BEM)
+// .modal, .modal__overlay, .modal__content
+// ============================================
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  display: none;
+
+  &--active {
+    display: block;
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  &__content {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    @include md {
+      width: 500px;
+    }
+  }
+
+  &__header {
+    padding: $spacing-lg;
+    border-bottom: 1px solid var(--color-border);
+    @include flex-between;
+  }
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    margin: 0;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: $font-size-xl;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    padding: $spacing-xs;
+
+    &:hover {
+      color: var(--color-text);
+    }
+  }
+
+  &__body {
+    padding: $spacing-lg;
+  }
+
+  &__footer {
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+  }
+}

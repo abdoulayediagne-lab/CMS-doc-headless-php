@@ -1,0 +1,43 @@
+// ============================================
+// Pagination (BEM)
+// .pagination, .pagination__item, .pagination__link
+// ============================================
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  justify-content: center;
+  margin: $spacing-xl 0;
+
+  &__item {
+    &--active .pagination__link {
+      background-color: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+    }
+
+    &--disabled .pagination__link {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 $spacing-sm;
+    font-size: $font-size-sm;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    @include transition(all);
+
+    &:hover {
+      background-color: var(--color-bg-secondary);
+    }
+  }
+}
