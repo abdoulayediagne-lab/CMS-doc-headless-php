@@ -1,0 +1,63 @@
+// ============================================
+// Grid system (mobile first)
+// .container, .grid, .col
+// ============================================
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+}
+
+.grid {
+  display: grid;
+  gap: $spacing-lg;
+  grid-template-columns: 1fr;
+
+  @include sm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include lg {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &--2 {
+    grid-template-columns: 1fr;
+    @include md {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  &--3 {
+    grid-template-columns: 1fr;
+    @include md {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  &--4 {
+    grid-template-columns: 1fr;
+    @include sm {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @include lg {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+
+// Layout wiki : sidebar + contenu
+.layout {
+  display: flex;
+  flex-direction: column;
+
+  @include md {
+    flex-direction: row;
+  }
+
+  &__content {
+    flex: 1;
+    padding: $spacing-xl;
+    min-width: 0;
+  }
+}

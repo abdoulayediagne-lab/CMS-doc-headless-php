@@ -1,0 +1,12 @@
+// ============================================
+// Footer layout
+// ============================================
+
+.footer {
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  padding: $spacing-xl;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: var(--color-text-secondary);
+}
