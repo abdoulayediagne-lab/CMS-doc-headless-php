@@ -85,7 +85,7 @@
 
     try {
       const payload = await api("/me", { method: "GET" });
-      const user = payload.user || {};
+      const user = payload.user || payload || {};
       setAlert(authStatus, "success", "Connecte: " + (user.email || "inconnu") + " (" + (user.role || "?") + ")");
     } catch (error) {
       clearToken();
