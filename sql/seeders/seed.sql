@@ -6,10 +6,10 @@
 -- USERS
 -- ============================================
 INSERT INTO users (username, email, password_hash, role) VALUES
-    ('admin', 'admin@cms-wiki.fr', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
-    ('editeur1', 'editeur@cms-wiki.fr', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'editor'),
-    ('auteur1', 'auteur@cms-wiki.fr', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'author'),
-    ('lecteur1', 'lecteur@cms-wiki.fr', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'reader');
+    ('admin', 'admin@cms-wiki.fr', '$2y$12$sP1u4PzEnysEUJ07oCu2hOqJ0RviT3FQeG7Y6ZPnxhX41w/zLmpxi', 'admin'),
+    ('editeur1', 'editeur@cms-wiki.fr', '$2y$12$sP1u4PzEnysEUJ07oCu2hOqJ0RviT3FQeG7Y6ZPnxhX41w/zLmpxi', 'editor'),
+    ('auteur1', 'auteur@cms-wiki.fr', '$2y$12$sP1u4PzEnysEUJ07oCu2hOqJ0RviT3FQeG7Y6ZPnxhX41w/zLmpxi', 'author'),
+    ('lecteur1', 'lecteur@cms-wiki.fr', '$2y$12$sP1u4PzEnysEUJ07oCu2hOqJ0RviT3FQeG7Y6ZPnxhX41w/zLmpxi', 'reader');
 
 -- ============================================
 -- SECTIONS (hiérarchie wiki)
