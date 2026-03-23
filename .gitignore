@@ -2,3 +2,4 @@ app/vendor
 pgdata/
 mysql/
 log/
+AGENT.md
