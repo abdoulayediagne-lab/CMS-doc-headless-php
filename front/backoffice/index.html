@@ -10,14 +10,19 @@
   </head>
   <body>
     <header class="navbar" role="banner">
-      <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="container" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
         <div class="navbar__brand">Backoffice CMS</div>
-        <button id="logout-btn" class="btn btn--outline" type="button">Se deconnecter</button>
+        <nav aria-label="Navigation backoffice" style="display: flex; gap: 0.5rem; align-items: center;">
+          <a id="nav-login" class="btn btn--outline btn--sm" href="#/login">Connexion</a>
+          <a id="nav-register" class="btn btn--outline btn--sm" href="#/register">Inscription</a>
+          <a id="nav-dashboard" class="btn btn--outline btn--sm" href="#/dashboard">Dashboard</a>
+          <button id="logout-btn" class="btn btn--outline btn--sm" type="button">Deconnexion</button>
+        </nav>
       </div>
     </header>
 
     <main class="container" role="main" aria-label="Backoffice" style="padding-top: 1.5rem; padding-bottom: 2rem;">
-      <section class="card" aria-labelledby="login-title" style="margin-bottom: 1rem;">
+      <section id="view-login" class="card" aria-labelledby="login-title" style="margin-bottom: 1rem;">
         <div class="card__header">
           <h1 id="login-title" class="card__title">Connexion</h1>
         </div>
@@ -33,11 +38,53 @@
             </div>
             <button class="btn btn--primary" type="submit">Se connecter</button>
           </form>
+          <p style="margin-top: 1rem;">
+            Pas encore de compte ?
+            <a href="#/register">Creer un compte</a>
+          </p>
           <div id="auth-status" class="alert alert--info" role="status" aria-live="polite" style="margin-top: 1rem;">Non connecte.</div>
         </div>
       </section>
 
-      <section class="card" aria-labelledby="users-title">
+      <section id="view-register" class="card" aria-labelledby="register-title" style="margin-bottom: 1rem;" hidden>
+        <div class="card__header">
+          <h1 id="register-title" class="card__title">Inscription</h1>
+        </div>
+        <div class="card__body">
+          <form id="register-form" class="form" novalidate>
+            <div class="form__group">
+              <label class="form__label" for="register-username">Nom d'utilisateur</label>
+              <input class="form__input" id="register-username" name="username" type="text" required minlength="2" />
+            </div>
+            <div class="form__group">
+              <label class="form__label" for="register-email">Email</label>
+              <input class="form__input" id="register-email" name="email" type="email" required />
+            </div>
+            <div class="form__group">
+              <label class="form__label" for="register-password">Mot de passe</label>
+              <input class="form__input" id="register-password" name="password" type="password" required minlength="8" />
+            </div>
+            <button class="btn btn--primary" type="submit">S'inscrire</button>
+          </form>
+          <p style="margin-top: 1rem;">
+            Deja un compte ?
+            <a href="#/login">Se connecter</a>
+          </p>
+          <div id="register-status" class="alert alert--info" role="status" aria-live="polite" style="margin-top: 1rem;">Remplis le formulaire pour creer ton compte.</div>
+        </div>
+      </section>
+
+      <section id="view-dashboard" class="card" aria-labelledby="dashboard-title" hidden>
+        <div class="card__header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h1 id="dashboard-title" class="card__title">Dashboard</h1>
+          <span id="current-user" class="badge badge--info">Non connecte</span>
+        </div>
+        <div class="card__body">
+          <p class="text-muted">Connecte-toi avec un compte admin pour charger la liste des utilisateurs.</p>
+        </div>
+      </section>
+
+      <section id="view-users" class="card" aria-labelledby="users-title" hidden>
         <div class="card__header" style="display: flex; justify-content: space-between; align-items: center;">
           <h2 id="users-title" class="card__title">Utilisateurs (admin)</h2>
           <button id="load-users-btn" class="btn btn--secondary" type="button">Charger</button>
