@@ -60,6 +60,16 @@
 }
 
 // ---------- Transition ----------
-@mixin transition($properties: all) {
-  transition: $properties var(--transition);
+@mixin transition($properties...) {
+  @if length($properties) == 0 {
+    transition: all var(--transition);
+  } @else if length($properties) == 1 {
+    transition: nth($properties, 1) var(--transition);
+  } @else {
+    $transitions: ();
+    @each $property in $properties {
+      $transitions: append($transitions, #{$property} var(--transition), comma);
+    }
+    transition: $transitions;
+  }
 }

@@ -22,9 +22,9 @@ services:
     command: >
       sh -c "npm install -g sass &&
       mkdir -p /workspace/front/public /workspace/front/backoffice &&
-      sass --watch --no-source-map
-      /workspace/sass/main.scss:/workspace/front/public/main.css
-      /workspace/sass/main.scss:/workspace/front/backoffice/main.css"
+      sass --watch --no-source-map /workspace/sass/main.scss:/workspace/front/public/main.css &
+      sass --watch --no-source-map /workspace/sass/main.scss:/workspace/front/backoffice/main.css &
+      wait"
 
   public-front:
     image: nginx:alpine
@@ -64,7 +64,7 @@ services:
       - pgdata:/var/lib/postgresql
       - ./sql/init/00-init-db.sh:/docker-entrypoint-initdb.d/00-init-db.sh:ro
       - ./sql/migrations:/docker-entrypoint-initdb.d/migrations:ro
-      - ./sql/seeders/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+      - ./sql/seeders/seed.sql:/docker-entrypoint-initdb.d/seeders/seed.sql:ro
 
 volumes:
   pgdata:

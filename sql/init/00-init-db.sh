@@ -8,6 +8,6 @@ for migration in /docker-entrypoint-initdb.d/migrations/0*.sql; do
 done
 
 echo "==> Seeding base accounts and sample data"
-psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f /docker-entrypoint-initdb.d/seed.sql
+psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f /docker-entrypoint-initdb.d/seeders/seed.sql
 
 echo "==> Database initialization complete"
