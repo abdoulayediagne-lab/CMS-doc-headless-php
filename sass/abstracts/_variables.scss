@@ -1,0 +1,167 @@
+// ============================================
+// Variables & CSS Custom Properties
+// Couleurs, typographie, espacements
+// Compatible dark mode
+// ============================================
+
+// ---------- Couleurs ----------
+$color-primary: #2563eb;
+$color-primary-light: #3b82f6;
+$color-primary-dark: #1d4ed8;
+
+$color-secondary: #64748b;
+$color-secondary-light: #94a3b8;
+$color-secondary-dark: #475569;
+
+$color-success: #16a34a;
+$color-warning: #d97706;
+$color-danger: #dc2626;
+$color-info: #0891b2;
+
+// Light mode
+$color-bg-light: #ffffff;
+$color-bg-secondary-light: #f8fafc;
+$color-bg-tertiary-light: #f1f5f9;
+$color-text-light: #1e293b;
+$color-text-secondary-light: #64748b;
+$color-border-light: #e2e8f0;
+
+// Dark mode
+$color-bg-dark: #0f172a;
+$color-bg-secondary-dark: #1e293b;
+$color-bg-tertiary-dark: #334155;
+$color-text-dark: #f1f5f9;
+$color-text-secondary-dark: #94a3b8;
+$color-border-dark: #334155;
+
+// ---------- Typographie ----------
+$font-family-sans:
+  "Inter",
+  system-ui,
+  -apple-system,
+  sans-serif;
+$font-family-mono: "Fira Code", "Courier New", monospace;
+
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 1.875rem;
+$font-size-4xl: 2.25rem;
+
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.25;
+$line-height-base: 1.5;
+$line-height-relaxed: 1.75;
+
+// ---------- Espacements ----------
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-2xl: 3rem;
+$spacing-3xl: 4rem;
+
+// ---------- Bordures ----------
+$border-radius-sm: 0.25rem;
+$border-radius-md: 0.5rem;
+$border-radius-lg: 0.75rem;
+$border-radius-xl: 1rem;
+$border-radius-full: 9999px;
+
+// ---------- Breakpoints (mobile first) ----------
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+
+// ---------- Ombres ----------
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+// ---------- Transitions ----------
+$transition-fast: 150ms ease;
+$transition-base: 250ms ease;
+$transition-slow: 350ms ease;
+
+// ============================================
+// Génération des CSS Custom Properties
+// ============================================
+:root {
+  // Couleurs
+  --color-primary: #{$color-primary};
+  --color-primary-light: #{$color-primary-light};
+  --color-primary-dark: #{$color-primary-dark};
+  --color-secondary: #{$color-secondary};
+  --color-success: #{$color-success};
+  --color-warning: #{$color-warning};
+  --color-danger: #{$color-danger};
+  --color-info: #{$color-info};
+
+  // Light mode (défaut)
+  --color-bg: #{$color-bg-light};
+  --color-bg-secondary: #{$color-bg-secondary-light};
+  --color-bg-tertiary: #{$color-bg-tertiary-light};
+  --color-text: #{$color-text-light};
+  --color-text-secondary: #{$color-text-secondary-light};
+  --color-border: #{$color-border-light};
+
+  // Typographie
+  --font-sans: #{$font-family-sans};
+  --font-mono: #{$font-family-mono};
+  --font-size-base: #{$font-size-base};
+  --line-height-base: #{$line-height-base};
+
+  // Espacements
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+  --spacing-xl: #{$spacing-xl};
+
+  // Bordures
+  --border-radius: #{$border-radius-md};
+  --border-color: #{$color-border-light};
+
+  // Ombres
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+
+  // Transitions
+  --transition: #{$transition-base};
+}
+
+// ============================================
+// Dark mode
+// ============================================
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #{$color-bg-dark};
+    --color-bg-secondary: #{$color-bg-secondary-dark};
+    --color-bg-tertiary: #{$color-bg-tertiary-dark};
+    --color-text: #{$color-text-dark};
+    --color-text-secondary: #{$color-text-secondary-dark};
+    --color-border: #{$color-border-dark};
+    --border-color: #{$color-border-dark};
+  }
+}
+
+// Classe pour forcer le dark mode
+[data-theme="dark"] {
+  --color-bg: #{$color-bg-dark};
+  --color-bg-secondary: #{$color-bg-secondary-dark};
+  --color-bg-tertiary: #{$color-bg-tertiary-dark};
+  --color-text: #{$color-text-dark};
+  --color-text-secondary: #{$color-text-secondary-dark};
+  --color-border: #{$color-border-dark};
+  --border-color: #{$color-border-dark};
+}
