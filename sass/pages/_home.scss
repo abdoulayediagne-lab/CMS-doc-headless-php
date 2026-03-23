@@ -1,0 +1,37 @@
+// ============================================
+// Page d'accueil du wiki
+// ============================================
+
+.home {
+  &__hero {
+    text-align: center;
+    padding: $spacing-3xl $spacing-lg;
+    background-color: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__title {
+    font-size: $font-size-3xl;
+    margin-bottom: $spacing-md;
+
+    @include md {
+      font-size: $font-size-4xl;
+    }
+  }
+
+  &__subtitle {
+    font-size: $font-size-lg;
+    color: var(--color-text-secondary);
+    max-width: 600px;
+    margin: 0 auto $spacing-xl;
+  }
+
+  &__search {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  &__sections {
+    padding: $spacing-2xl $spacing-lg;
+  }
+}

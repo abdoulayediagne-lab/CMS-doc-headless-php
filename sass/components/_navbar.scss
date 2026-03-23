@@ -1,0 +1,88 @@
+// ============================================
+// Navbar (BEM)
+// .navbar, .navbar__brand, .navbar__menu
+// ============================================
+
+.navbar {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: $spacing-md $spacing-lg;
+  @include flex-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  &__brand {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: var(--color-text);
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  &__menu {
+    display: none;
+    gap: $spacing-md;
+
+    @include md {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  &__link {
+    color: var(--color-text-secondary);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    @include transition(all);
+
+    &:hover {
+      color: var(--color-text);
+      background-color: var(--color-bg-secondary);
+    }
+
+    &--active {
+      color: var(--color-primary);
+      background-color: var(--color-bg-secondary);
+    }
+  }
+
+  &__toggle {
+    display: flex;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $spacing-sm;
+    color: var(--color-text);
+
+    @include md {
+      display: none;
+    }
+  }
+
+  // Menu mobile ouvert
+  &__menu--open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: $spacing-md $spacing-lg;
+    box-shadow: var(--shadow-md);
+
+    @include md {
+      position: static;
+      flex-direction: row;
+      padding: 0;
+      box-shadow: none;
+      border: none;
+    }
+  }
+}

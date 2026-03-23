@@ -1,0 +1,104 @@
+// ============================================
+// Bouton (BEM)
+// .btn, .btn--primary, .btn--secondary, etc.
+// ============================================
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-base;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  @include transition(all);
+
+  &:hover {
+    background-color: var(--color-bg-secondary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  // ---------- Variantes (BEM Modifier) ----------
+
+  &--primary {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+
+    &:hover {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+    }
+  }
+
+  &--secondary {
+    background-color: var(--color-secondary);
+    color: #ffffff;
+    border-color: var(--color-secondary);
+
+    &:hover {
+      background-color: var(--color-secondary-dark);
+    }
+  }
+
+  &--success {
+    background-color: var(--color-success);
+    color: #ffffff;
+    border-color: var(--color-success);
+  }
+
+  &--danger {
+    background-color: var(--color-danger);
+    color: #ffffff;
+    border-color: var(--color-danger);
+  }
+
+  &--warning {
+    background-color: var(--color-warning);
+    color: #ffffff;
+    border-color: var(--color-warning);
+  }
+
+  // ---------- Tailles ----------
+
+  &--sm {
+    padding: $spacing-xs $spacing-md;
+    font-size: $font-size-xs;
+  }
+
+  &--lg {
+    padding: $spacing-md $spacing-xl;
+    font-size: $font-size-lg;
+  }
+
+  &--full {
+    width: 100%;
+  }
+
+  // ---------- Outline ----------
+
+  &--outline {
+    background-color: transparent;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+
+    &:hover {
+      background-color: var(--color-primary);
+      color: #ffffff;
+    }
+  }
+}

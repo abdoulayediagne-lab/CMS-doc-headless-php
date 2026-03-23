@@ -1,0 +1,41 @@
+// ============================================
+// Alert (BEM)
+// .alert, .alert--success, .alert--danger
+// ============================================
+
+.alert {
+  padding: $spacing-md $spacing-lg;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-border);
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-lg;
+
+  &__title {
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-xs;
+  }
+
+  &--success {
+    background-color: rgba($color-success, 0.1);
+    border-color: rgba($color-success, 0.3);
+    color: var(--color-success);
+  }
+
+  &--danger {
+    background-color: rgba($color-danger, 0.1);
+    border-color: rgba($color-danger, 0.3);
+    color: var(--color-danger);
+  }
+
+  &--warning {
+    background-color: rgba($color-warning, 0.1);
+    border-color: rgba($color-warning, 0.3);
+    color: var(--color-warning);
+  }
+
+  &--info {
+    background-color: rgba($color-info, 0.1);
+    border-color: rgba($color-info, 0.3);
+    color: var(--color-info);
+  }
+}

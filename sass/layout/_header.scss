@@ -1,0 +1,9 @@
+// ============================================
+// Header layout
+// ============================================
+
+.header {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: $spacing-lg $spacing-xl;
+}

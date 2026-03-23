@@ -1,0 +1,66 @@
+// ============================================
+// Formulaire (BEM)
+// .form, .form__group, .form__input, etc.
+// ============================================
+
+.form {
+  &__group {
+    margin-bottom: $spacing-lg;
+  }
+
+  &__label {
+    display: block;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: var(--color-text);
+    margin-bottom: $spacing-xs;
+  }
+
+  &__input,
+  &__select,
+  &__textarea {
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-base;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    @include transition(border-color);
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+    }
+
+    &::placeholder {
+      color: var(--color-text-secondary);
+    }
+
+    &--error {
+      border-color: var(--color-danger);
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba($color-danger, 0.1);
+      }
+    }
+  }
+
+  &__textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  &__help {
+    font-size: $font-size-xs;
+    color: var(--color-text-secondary);
+    margin-top: $spacing-xs;
+  }
+
+  &__error {
+    font-size: $font-size-xs;
+    color: var(--color-danger);
+    margin-top: $spacing-xs;
+  }
+}

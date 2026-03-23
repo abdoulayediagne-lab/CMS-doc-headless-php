@@ -1,0 +1,65 @@
+// ============================================
+// Card (BEM)
+// .card, .card__header, .card__body, .card__footer
+// ============================================
+
+.card {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  @include transition(box-shadow);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  // ---------- Éléments (BEM Element) ----------
+
+  &__header {
+    padding: $spacing-lg;
+    border-bottom: 1px solid var(--color-border);
+    @include flex-between;
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  &__body {
+    padding: $spacing-lg;
+  }
+
+  &__footer {
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg-secondary);
+  }
+
+  &__image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  // ---------- Modificateurs ----------
+
+  &--flat {
+    box-shadow: none;
+    border: none;
+    background-color: var(--color-bg-secondary);
+  }
+
+  &--clickable {
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+  }
+}
