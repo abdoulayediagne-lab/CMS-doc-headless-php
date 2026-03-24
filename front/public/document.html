@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document - CMS Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" />
+    <link rel="stylesheet" href="./main.css" />
+  </head>
+  <body>
+    <header class="navbar" role="banner">
+      <div class="container public-nav">
+        <div class="navbar__brand">Docs Entreprise</div>
+        <a class="btn btn--outline btn--sm" href="./index.html">Retour a la liste</a>
+      </div>
+    </header>
+
+    <main class="container public-page" role="main" aria-label="Lecture document">
+      <section class="card public-detail" aria-labelledby="doc-title">
+        <div class="card__header public-detail__header">
+          <h1 id="doc-title" class="card__title">Chargement...</h1>
+          <span id="doc-status" class="badge badge--info">-</span>
+        </div>
+        <div class="card__body">
+          <div id="doc-meta" class="public-detail__meta text-muted"></div>
+          <div id="doc-tags" class="public-detail__tags"></div>
+          <article id="doc-content" class="public-detail__content"></article>
+        </div>
+      </section>
+      <div id="doc-alert" class="alert alert--info" role="status" aria-live="polite">Chargement du document...</div>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      <div class="container">CMS headless - Front public documentation</div>
+    </footer>
+
+    <script src="./document.js" defer></script>
+  </body>
+</html>

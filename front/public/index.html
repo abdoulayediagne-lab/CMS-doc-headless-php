@@ -21,7 +21,22 @@
         <div class="card__body">
           <p class="public-page__eyebrow">Headless CMS</p>
           <h1 id="public-title" class="public-page__title">Documentation publique</h1>
-          <p class="public-page__subtitle">Explore les articles publies depuis l'API, avec un rendu propre et responsive.</p>
+          <p class="public-page__subtitle">Explore les articles publies depuis l'API, filtre les contenus et lis les documents sur une page dediee.</p>
+        </div>
+      </section>
+
+      <section class="card public-page__filters" aria-labelledby="filters-title">
+        <div class="card__header">
+          <h2 id="filters-title" class="card__title">Recherche</h2>
+        </div>
+        <div class="card__body">
+          <form id="search-form" class="form public-page__filters-form" novalidate>
+            <div class="form__group">
+              <label class="form__label" for="search-input">Mot-cle</label>
+              <input id="search-input" class="form__input" type="search" placeholder="Titre ou contenu" />
+            </div>
+            <button class="btn btn--primary" type="submit">Filtrer</button>
+          </form>
         </div>
       </section>
 

@@ -37,7 +37,7 @@ class PatchUserController extends AbstractController {
         $role = null;
         if (array_key_exists('role', $payload)) {
             $role = (string) $payload['role'];
-            $allowedRoles = ['reader', 'editor', 'admin'];
+            $allowedRoles = ['reader', 'author', 'editor', 'admin'];
             if (!in_array($role, $allowedRoles, true)) {
                 return new Response(
                     json_encode(['error' => 'invalid role']),

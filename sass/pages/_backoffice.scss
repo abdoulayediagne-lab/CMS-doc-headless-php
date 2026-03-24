@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // Backoffice page
 // ============================================
 
@@ -31,5 +31,86 @@
 
   &__status {
     margin-top: $spacing-md;
+  }
+
+  &__filters {
+    display: grid;
+    gap: $spacing-md;
+    grid-template-columns: repeat(4, minmax(140px, 1fr)) auto;
+    align-items: end;
+    margin-bottom: $spacing-md;
+
+    .form__group {
+      margin-bottom: 0;
+    }
+  }
+
+  &__subpanel {
+    margin-top: $spacing-lg;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+    gap: $spacing-md;
+    margin-bottom: $spacing-md;
+  }
+
+  &__stat-value {
+    margin-top: $spacing-sm;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: var(--color-text);
+  }
+
+  &__detail-content {
+    padding: $spacing-md;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background: var(--color-bg-secondary);
+    line-height: 1.65;
+    max-height: 420px;
+    overflow: auto;
+    word-break: break-word;
+  }
+
+  &__inline-form {
+    display: grid;
+    gap: $spacing-sm;
+    grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+    margin-bottom: $spacing-md;
+    align-items: end;
+  }
+
+  &__row-actions {
+    display: flex;
+    gap: $spacing-xs;
+    flex-wrap: wrap;
+  }
+}
+
+@include md {
+  .backoffice-page {
+    &__filters {
+      grid-template-columns: repeat(2, minmax(140px, 1fr));
+    }
+
+    &__inline-form {
+      grid-template-columns: repeat(2, minmax(140px, 1fr));
+    }
+
+    &__stats {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+@include sm {
+  .backoffice-nav {
+    align-items: stretch;
+
+    &__menu {
+      width: 100%;
+    }
   }
 }

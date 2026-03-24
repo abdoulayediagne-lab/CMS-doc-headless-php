@@ -12,6 +12,11 @@ body {
   @include transition(background-color, color);
 }
 
+// Keep native hidden semantics even when utility/component classes set display.
+[hidden] {
+  display: none !important;
+}
+
 a {
   color: var(--color-primary);
   @include transition(color);

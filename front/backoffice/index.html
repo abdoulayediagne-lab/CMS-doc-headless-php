@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
@@ -15,8 +15,9 @@
         <nav class="backoffice-nav__menu" aria-label="Navigation backoffice">
           <a id="nav-login" class="btn btn--outline btn--sm" href="#/login">Connexion</a>
           <a id="nav-register" class="btn btn--outline btn--sm" href="#/register">Inscription</a>
-          <a id="nav-dashboard" class="btn btn--outline btn--sm" href="#/dashboard">Dashboard</a>
-          <button id="logout-btn" class="btn btn--outline btn--sm" type="button">Deconnexion</button>
+          <a id="nav-dashboard" class="btn btn--outline btn--sm" href="#/dashboard" hidden>Dashboard</a>
+          <a id="nav-documents" class="btn btn--outline btn--sm" href="#/documents" hidden>Documents</a>
+          <button id="logout-btn" class="btn btn--outline btn--sm" type="button" hidden>Deconnexion</button>
         </nav>
       </div>
     </header>
@@ -38,7 +39,7 @@
             </div>
             <button class="btn btn--primary" type="submit">Se connecter</button>
           </form>
-          <p style="margin-top: 1rem;">
+          <p class="mt-md">
             Pas encore de compte ?
             <a href="#/register">Creer un compte</a>
           </p>
@@ -66,7 +67,7 @@
             </div>
             <button class="btn btn--primary" type="submit">S'inscrire</button>
           </form>
-          <p style="margin-top: 1rem;">
+          <p class="mt-md">
             Deja un compte ?
             <a href="#/login">Se connecter</a>
           </p>
@@ -80,31 +81,241 @@
           <span id="current-user" class="badge badge--info">Non connecte</span>
         </div>
         <div class="card__body">
-          <p class="text-muted">Connecte-toi avec un compte admin pour gerer les utilisateurs et contenus.</p>
+          <p id="dashboard-intro" class="text-muted">Connecte-toi pour charger ton espace.</p>
+          <div id="dashboard-alert" class="alert alert--info">Selectionne une vue via le menu.</div>
+
+          <section id="dashboard-admin" class="backoffice-page__subpanel" hidden>
+            <div class="backoffice-page__stats">
+              <article class="card">
+                <div class="card__body">
+                  <p class="text-muted m-0">Utilisateurs</p>
+                  <p id="admin-users-count" class="backoffice-page__stat-value">-</p>
+                </div>
+              </article>
+              <article class="card">
+                <div class="card__body">
+                  <p class="text-muted m-0">Documents</p>
+                  <p id="admin-documents-count" class="backoffice-page__stat-value">-</p>
+                </div>
+              </article>
+            </div>
+
+            <div id="admin-status" class="alert alert--info">Zone admin.</div>
+
+            <section class="backoffice-page__subpanel">
+              <div class="backoffice-page__header-row mb-md">
+                <h3 class="m-0">Utilisateurs</h3>
+                <button id="load-users-btn" class="btn btn--secondary" type="button">Charger</button>
+              </div>
+              <div class="table-wrapper">
+                <table class="table" aria-label="Liste des utilisateurs">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Username</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Actif</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="users-body"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="backoffice-page__subpanel">
+              <div class="backoffice-page__header-row mb-md">
+                <h3 class="m-0">Tags</h3>
+                <button id="load-tags-btn" class="btn btn--secondary" type="button">Charger</button>
+              </div>
+              <form id="tag-create-form" class="form backoffice-page__inline-form" novalidate>
+                <input id="tag-create-name" class="form__input" type="text" placeholder="Nom tag" required />
+                <input id="tag-create-slug" class="form__input" type="text" placeholder="Slug (optionnel)" />
+                <button class="btn btn--primary" type="submit">Ajouter</button>
+              </form>
+              <div class="table-wrapper">
+                <table class="table" aria-label="Liste des tags">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Slug</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tags-body"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="backoffice-page__subpanel">
+              <div class="backoffice-page__header-row mb-md">
+                <h3 class="m-0">Sections</h3>
+                <button id="load-sections-btn" class="btn btn--secondary" type="button">Charger</button>
+              </div>
+              <form id="section-create-form" class="form backoffice-page__inline-form" novalidate>
+                <input id="section-create-name" class="form__input" type="text" placeholder="Nom section" required />
+                <input id="section-create-slug" class="form__input" type="text" placeholder="Slug (optionnel)" />
+                <input id="section-create-parent" class="form__input" type="number" min="1" placeholder="Parent ID" />
+                <button class="btn btn--primary" type="submit">Ajouter</button>
+              </form>
+              <div class="table-wrapper">
+                <table class="table" aria-label="Liste des sections">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Slug</th>
+                      <th>Parent</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sections-body"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="backoffice-page__subpanel">
+              <div class="backoffice-page__header-row mb-md">
+                <h3 class="m-0">Audit logs</h3>
+                <button id="load-logs-btn" class="btn btn--secondary" type="button">Charger</button>
+              </div>
+              <div class="table-wrapper">
+                <table class="table" aria-label="Liste des logs">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Action</th>
+                      <th>Entity</th>
+                      <th>User</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="logs-body"></tbody>
+                </table>
+              </div>
+            </section>
+          </section>
         </div>
       </section>
 
-      <section id="view-users" class="card backoffice-page__panel" aria-labelledby="users-title" hidden>
+      <section id="view-documents" class="card backoffice-page__panel" aria-labelledby="documents-title" hidden>
         <div class="card__header backoffice-page__header-row">
-          <h2 id="users-title" class="card__title">Utilisateurs (admin)</h2>
-          <button id="load-users-btn" class="btn btn--secondary" type="button">Charger</button>
+          <h2 id="documents-title" class="card__title">Documents</h2>
+          <button id="refresh-documents-btn" class="btn btn--secondary" type="button">Rafraichir</button>
         </div>
         <div class="card__body">
-          <div id="users-status" class="alert alert--info" role="status" aria-live="polite">Connecte-toi en admin pour lister les utilisateurs.</div>
+          <form id="documents-filter-form" class="form backoffice-page__filters" novalidate>
+            <div class="form__group">
+              <label class="form__label" for="doc-search">Recherche</label>
+              <input id="doc-search" class="form__input" type="search" placeholder="Titre ou contenu" />
+            </div>
+            <div class="form__group">
+              <label class="form__label" for="doc-status-filter">Statut</label>
+              <select id="doc-status-filter" class="form__select">
+                <option value="">Tous</option>
+                <option value="draft">draft</option>
+                <option value="review">review</option>
+                <option value="published">published</option>
+                <option value="archived">archived</option>
+              </select>
+            </div>
+            <div class="form__group">
+              <label class="form__label" for="doc-section-filter">Section</label>
+              <select id="doc-section-filter" class="form__select">
+                <option value="">Toutes</option>
+              </select>
+            </div>
+            <div class="form__group">
+              <label class="form__label" for="doc-tag-filter">Tag</label>
+              <select id="doc-tag-filter" class="form__select">
+                <option value="">Tous</option>
+              </select>
+            </div>
+            <button class="btn btn--primary" type="submit">Appliquer</button>
+          </form>
+
+          <div id="documents-status" class="alert alert--info" role="status" aria-live="polite">Charge les documents.</div>
           <div class="table-wrapper">
-            <table class="table" aria-label="Liste des utilisateurs">
+            <table class="table" aria-label="Liste des documents">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Active</th>
+                  <th>Titre</th>
+                  <th>Auteur</th>
+                  <th>Statut</th>
+                  <th>Tags</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="users-body"></tbody>
+              <tbody id="documents-body"></tbody>
             </table>
           </div>
+
+          <section id="document-detail" class="card backoffice-page__subpanel" hidden>
+            <div class="card__header">
+              <h3 class="card__title">Lecture detaillee</h3>
+            </div>
+            <div class="card__body">
+              <h4 id="document-detail-title" class="m-0">-</h4>
+              <p id="document-detail-meta" class="text-muted"></p>
+              <div id="document-detail-content" class="backoffice-page__detail-content"></div>
+            </div>
+          </section>
+
+          <section id="document-editor" class="card backoffice-page__subpanel" hidden>
+            <div class="card__header backoffice-page__header-row">
+              <h3 id="document-editor-title" class="card__title">Nouveau document</h3>
+              <button id="document-editor-reset" class="btn btn--outline btn--sm" type="button">Reinitialiser</button>
+            </div>
+            <div class="card__body">
+              <form id="document-form" class="form" novalidate>
+                <input id="document-id" type="hidden" />
+                <div class="form__group">
+                  <label class="form__label" for="document-title">Titre</label>
+                  <input id="document-title" class="form__input" type="text" required />
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="document-slug">Slug</label>
+                  <input id="document-slug" class="form__input" type="text" placeholder="auto si vide" />
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="document-content">Contenu</label>
+                  <textarea id="document-content" class="form__textarea" rows="8"></textarea>
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="document-status">Statut</label>
+                  <select id="document-status" class="form__select">
+                    <option value="draft">draft</option>
+                    <option value="review">review</option>
+                    <option value="published">published</option>
+                    <option value="archived">archived</option>
+                  </select>
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="document-section">Section</label>
+                  <select id="document-section" class="form__select">
+                    <option value="">Aucune</option>
+                  </select>
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="document-tags">Tags</label>
+                  <input id="document-tags" class="form__input" type="text" placeholder="guide, onboarding, api" />
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="document-meta-title">Meta title</label>
+                  <input id="document-meta-title" class="form__input" type="text" />
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="document-meta-description">Meta description</label>
+                  <textarea id="document-meta-description" class="form__textarea" rows="3"></textarea>
+                </div>
+                <button id="document-submit" class="btn btn--primary" type="submit">Enregistrer</button>
+              </form>
+              <div id="document-form-status" class="alert alert--info backoffice-page__status">Le formulaire est reserve aux editeurs et admins.</div>
+            </div>
+          </section>
         </div>
       </section>
     </main>
