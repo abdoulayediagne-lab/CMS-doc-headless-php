@@ -46,9 +46,7 @@ services:
       - sass-builder
 
   php-framework-db:
-    build:
-      context: .
-      dockerfile: docker/postgres/Dockerfile
+    image: postgres:18
     container_name: php-framework-postgres
     restart: unless-stopped
     environment:
@@ -59,6 +57,9 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql
+      - ./sql/init/00-init-db.sh:/docker-entrypoint-initdb.d/00-init-db.sh:ro
+      - ./sql/migrations:/docker-entrypoint-initdb.d/migrations:ro
+      - ./sql/seeders/seed.sql:/docker-entrypoint-initdb.d/seeders/seed.sql:ro
 
 volumes:
   pgdata:
