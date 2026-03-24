@@ -4,6 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    working_dir: /var/www/html
+    command: >
+      sh -lc "composer install --no-interaction --prefer-dist --optimize-autoloader && apache2-foreground"
     volumes:
       - ./app:/var/www/html
       - ./log:/var/log/apache2/
@@ -57,9 +60,9 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql
-      - ./sql/init/00-init-db.sh:/docker-entrypoint-initdb.d/00-init-db.sh:ro
+      - ./sql/init/00-init-db.sql:/docker-entrypoint-initdb.d/00-init-db.sql:ro
       - ./sql/migrations:/docker-entrypoint-initdb.d/migrations:ro
-      - ./sql/seeders/seed.sql:/docker-entrypoint-initdb.d/seeders/seed.sql:ro
+      - ./sql/seeders:/docker-entrypoint-initdb.d/seeders:ro
 
 volumes:
   pgdata:
