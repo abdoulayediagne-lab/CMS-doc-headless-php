@@ -13,10 +13,10 @@ Au premier demarrage (base vide), PostgreSQL execute automatiquement:
 
 Comptes de test:
 
-- **admin@cms.fr** / password123 (Administrateur - Accès complet)
-- **editeur@cms.fr** / password123 (Éditeur - Peut publier et modifier)
-- **auteur@cms.fr** / password123 (Auteur - Peut créer des brouillons)
-- **lecteur@cms.fr** / password123 (Lecteur - Accès lecture seule)
+- admin@cms-wiki.fr / password123
+- editeur@cms-wiki.fr / password123
+- auteur@cms-wiki.fr / password123
+- lecteur@cms-wiki.fr / password123
 
 ## Reinitialiser la base (si necessaire)
 

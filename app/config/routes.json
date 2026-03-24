@@ -1,10 +1,5 @@
 [
   {
-    "path": "/",
-    "method": "GET",
-    "controller": "HomeController"
-  },
-  {
     "path": "/auth/register",
     "method": "POST",
     "controller": "Auth\\PostRegisterController"
@@ -28,11 +23,6 @@
     "path": "/me",
     "method": "GET",
     "controller": "Auth\\GetMeController"
-  },
-  {
-    "path": "/dashboard",
-    "method": "GET",
-    "controller": "Dashboard\\GetDashboardController"
   },
   {
     "path": "/documents/:id/versions",

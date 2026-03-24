@@ -1,11 +1,15 @@
+-- Seeder : Données de test pour le CMS Wiki
+-- Mot de passe pour tous les users : "password123"
+-- Le hash correspond à password_hash('password123', PASSWORD_BCRYPT)
+
 -- ============================================
 -- USERS
 -- ============================================
 INSERT INTO users (username, email, password_hash, role) VALUES
-    ('admin', 'admin@cms.fr', '$2y$12$5IT/CTYqLMS.wcjwzlZBDu6hvDpA/DzC1F65kcLMbgZbhTdwKM/6m', 'admin'),
-    ('editeur1', 'editeur@cms.fr', '$2y$12$5IT/CTYqLMS.wcjwzlZBDu6hvDpA/DzC1F65kcLMbgZbhTdwKM/6m', 'editor'),
-    ('auteur1', 'auteur@cms.fr', '$2y$12$5IT/CTYqLMS.wcjwzlZBDu6hvDpA/DzC1F65kcLMbgZbhTdwKM/6m', 'author'),
-    ('lecteur1', 'lecteur@cms.fr', '$2y$12$5IT/CTYqLMS.wcjwzlZBDu6hvDpA/DzC1F65kcLMbgZbhTdwKM/6m', 'reader');
+    ('admin', 'admin@cms-wiki.fr', '$2y$12$sP1u4PzEnysEUJ07oCu2hOqJ0RviT3FQeG7Y6ZPnxhX41w/zLmpxi', 'admin'),
+    ('editeur1', 'editeur@cms-wiki.fr', '$2y$12$sP1u4PzEnysEUJ07oCu2hOqJ0RviT3FQeG7Y6ZPnxhX41w/zLmpxi', 'editor'),
+    ('auteur1', 'auteur@cms-wiki.fr', '$2y$12$sP1u4PzEnysEUJ07oCu2hOqJ0RviT3FQeG7Y6ZPnxhX41w/zLmpxi', 'author'),
+    ('lecteur1', 'lecteur@cms-wiki.fr', '$2y$12$sP1u4PzEnysEUJ07oCu2hOqJ0RviT3FQeG7Y6ZPnxhX41w/zLmpxi', 'reader');
 
 -- ============================================
 -- SECTIONS (hiérarchie wiki)
