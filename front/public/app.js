@@ -30,18 +30,24 @@
         const title = escapeHtml(doc.title || "Sans titre");
         const excerpt = escapeHtml((doc.content || "").slice(0, 140));
         const slug = escapeHtml(doc.slug || "");
+        const author = escapeHtml(doc.author_name || "Equipe Docs");
+        const status = escapeHtml(doc.status || "published");
         return (
-          '<article class="card" aria-label="Document ' +
+          '<article class="card card--clickable" aria-label="Document ' +
           title +
           '">' +
           '<div class="card__header"><h3 class="card__title">' +
           title +
-          "</h3></div>" +
+          '</h3><span class="badge badge--published">' +
+          status +
+          "</span></div>" +
           '<div class="card__body"><p>' +
           excerpt +
           "...</p></div>" +
           '<div class="card__footer"><small class="text-muted">slug: ' +
           slug +
+          " - auteur: " +
+          author +
           "</small></div>" +
           "</article>"
         );
@@ -66,7 +72,7 @@
       renderDocs(payload.data || []);
     } catch (error) {
       gridEl.innerHTML = "";
-      setStatus(error.message, "danger");
+      setStatus("Impossible de charger les documents: " + error.message, "danger");
     }
   }
 

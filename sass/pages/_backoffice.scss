@@ -1,0 +1,35 @@
+// ============================================
+// Backoffice page
+// ============================================
+
+.backoffice-nav {
+  @include flex-between;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+
+  &__menu {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+  }
+}
+
+.backoffice-page {
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-2xl;
+
+  &__panel {
+    margin-bottom: $spacing-lg;
+  }
+
+  &__header-row {
+    @include flex-between;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+  }
+
+  &__status {
+    margin-top: $spacing-md;
+  }
+}

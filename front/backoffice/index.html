@@ -10,9 +10,9 @@
   </head>
   <body>
     <header class="navbar" role="banner">
-      <div class="container" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+      <div class="container backoffice-nav">
         <div class="navbar__brand">Backoffice CMS</div>
-        <nav aria-label="Navigation backoffice" style="display: flex; gap: 0.5rem; align-items: center;">
+        <nav class="backoffice-nav__menu" aria-label="Navigation backoffice">
           <a id="nav-login" class="btn btn--outline btn--sm" href="#/login">Connexion</a>
           <a id="nav-register" class="btn btn--outline btn--sm" href="#/register">Inscription</a>
           <a id="nav-dashboard" class="btn btn--outline btn--sm" href="#/dashboard">Dashboard</a>
@@ -21,8 +21,8 @@
       </div>
     </header>
 
-    <main class="container" role="main" aria-label="Backoffice" style="padding-top: 1.5rem; padding-bottom: 2rem;">
-      <section id="view-login" class="card" aria-labelledby="login-title" style="margin-bottom: 1rem;">
+    <main class="container backoffice-page" role="main" aria-label="Backoffice">
+      <section id="view-login" class="card backoffice-page__panel" aria-labelledby="login-title">
         <div class="card__header">
           <h1 id="login-title" class="card__title">Connexion</h1>
         </div>
@@ -42,11 +42,11 @@
             Pas encore de compte ?
             <a href="#/register">Creer un compte</a>
           </p>
-          <div id="auth-status" class="alert alert--info" role="status" aria-live="polite" style="margin-top: 1rem;">Non connecte.</div>
+          <div id="auth-status" class="alert alert--info backoffice-page__status" role="status" aria-live="polite">Non connecte.</div>
         </div>
       </section>
 
-      <section id="view-register" class="card" aria-labelledby="register-title" style="margin-bottom: 1rem;" hidden>
+      <section id="view-register" class="card backoffice-page__panel" aria-labelledby="register-title" hidden>
         <div class="card__header">
           <h1 id="register-title" class="card__title">Inscription</h1>
         </div>
@@ -70,28 +70,28 @@
             Deja un compte ?
             <a href="#/login">Se connecter</a>
           </p>
-          <div id="register-status" class="alert alert--info" role="status" aria-live="polite" style="margin-top: 1rem;">Remplis le formulaire pour creer ton compte.</div>
+          <div id="register-status" class="alert alert--info backoffice-page__status" role="status" aria-live="polite">Remplis le formulaire pour creer ton compte.</div>
         </div>
       </section>
 
-      <section id="view-dashboard" class="card" aria-labelledby="dashboard-title" hidden>
-        <div class="card__header" style="display: flex; justify-content: space-between; align-items: center;">
+      <section id="view-dashboard" class="card backoffice-page__panel" aria-labelledby="dashboard-title" hidden>
+        <div class="card__header backoffice-page__header-row">
           <h1 id="dashboard-title" class="card__title">Dashboard</h1>
           <span id="current-user" class="badge badge--info">Non connecte</span>
         </div>
         <div class="card__body">
-          <p class="text-muted">Connecte-toi avec un compte admin pour charger la liste des utilisateurs.</p>
+          <p class="text-muted">Connecte-toi avec un compte admin pour gerer les utilisateurs et contenus.</p>
         </div>
       </section>
 
-      <section id="view-users" class="card" aria-labelledby="users-title" hidden>
-        <div class="card__header" style="display: flex; justify-content: space-between; align-items: center;">
+      <section id="view-users" class="card backoffice-page__panel" aria-labelledby="users-title" hidden>
+        <div class="card__header backoffice-page__header-row">
           <h2 id="users-title" class="card__title">Utilisateurs (admin)</h2>
           <button id="load-users-btn" class="btn btn--secondary" type="button">Charger</button>
         </div>
         <div class="card__body">
           <div id="users-status" class="alert alert--info" role="status" aria-live="polite">Connecte-toi en admin pour lister les utilisateurs.</div>
-          <div class="table-responsive">
+          <div class="table-wrapper">
             <table class="table" aria-label="Liste des utilisateurs">
               <thead>
                 <tr>
