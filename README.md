@@ -6,6 +6,8 @@
 docker compose up -d --build
 ```
 
+Au demarrage du service PHP, `composer install` est execute automatiquement pour generer `app/vendor/autoload.php`.
+
 Au premier demarrage (base vide), PostgreSQL execute automatiquement:
 
 - les migrations `sql/migrations/0*.sql`
@@ -19,6 +21,8 @@ Comptes de test:
 - lecteur@cms-wiki.fr / password123
 
 ## Reinitialiser la base (si necessaire)
+
+Si tu vois des erreurs SQL du type `relation \"users\" does not exist` ou `relation \"documents\" does not exist`, reinitialise le volume PostgreSQL:
 
 ```bash
 docker compose down -v
