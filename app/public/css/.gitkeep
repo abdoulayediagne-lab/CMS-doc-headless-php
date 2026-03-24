@@ -1,0 +1,3 @@
+# This directory is used for compiled CSS files
+# CSS files are generated from SCSS by the sass-builder service
+# Do not commit .css files, only SCSS sources in /sass

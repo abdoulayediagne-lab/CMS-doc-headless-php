@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CMS Wiki - Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/public/css/main.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a class="navbar__brand" href="/">CMS Wiki</a>
+      <button
+        class="navbar__toggle"
+        onclick="
+          document
+            .querySelector('.navbar__menu')
+            .classList.toggle('navbar__menu--open')
+        "
+      >
+        &#9776;
+      </button>
+      <div class="navbar__menu">
+        <a class="navbar__link navbar__link--active" href="/">Accueil</a>
+        <a class="navbar__link" href="/public/documents">Documents</a>
+        <a class="navbar__link" href="/public/sections">Sections</a>
+        <a class="navbar__link" href="/public/tags">Tags</a>
+        <a class="navbar__link" href="/auth/login">Connexion</a>
+      </div>
+    </nav>
+
+    <div class="home__hero">
+      <h1 class="home__title">CMS Wiki</h1>
+      <p class="home__subtitle">
+        Documentation collaborative, modulaire et extensible. Construit from
+        scratch en PHP.
+      </p>
+      <div class="home__search">
+        <form class="form" action="/public/documents" method="GET">
+          <div class="d-flex gap-sm">
+            <input
+              class="form__input"
+              type="text"
+              name="q"
+              placeholder="Rechercher un document..."
+            />
+            <button class="btn btn--primary" type="submit">Rechercher</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="home__sections">
+        <h2 class="mb-lg">Sections du wiki</h2>
+        <div class="grid grid--3">
+          <div class="card card--clickable">
+            <div class="card__header">
+              <h3 class="card__title">Guide de demarrage</h3>
+            </div>
+            <div class="card__body">
+              <p>
+                Tout pour bien commencer avec le CMS Wiki. Installation,
+                configuration et premiers pas.
+              </p>
+            </div>
+            <div class="card__footer">
+              <span class="badge badge--info">3 documents</span>
+            </div>
+          </div>
+
+          <div class="card card--clickable">
+            <div class="card__header">
+              <h3 class="card__title">Architecture technique</h3>
+            </div>
+            <div class="card__body">
+              <p>
+                Documentation technique du projet : framework PHP, ORM, base de
+                donnees PostgreSQL.
+              </p>
+            </div>
+            <div class="card__footer">
+              <span class="badge badge--info">5 documents</span>
+            </div>
+          </div>
+
+          <div class="card card--clickable">
+            <div class="card__header">
+              <h3 class="card__title">API Reference</h3>
+            </div>
+            <div class="card__body">
+              <p>
+                Documentation complete des endpoints de l'API REST publique et
+                authentifiee.
+              </p>
+            </div>
+            <div class="card__footer">
+              <span class="badge badge--info">8 documents</span>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="mt-xl mb-lg">Documents recents</h2>
+        <div class="table-wrapper">
+          <table class="table table--striped">
+            <thead class="table__header">
+              <tr>
+                <th>Titre</th>
+                <th>Section</th>
+                <th>Auteur</th>
+                <th>Statut</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="table__row">
+                <td><a href="#">Installation avec Docker</a></td>
+                <td>Guide de demarrage</td>
+                <td>admin</td>
+                <td><span class="badge badge--published">Publie</span></td>
+                <td>21/03/2026</td>
+              </tr>
+              <tr class="table__row">
+                <td><a href="#">Configuration PostgreSQL</a></td>
+                <td>Architecture</td>
+                <td>admin</td>
+                <td><span class="badge badge--published">Publie</span></td>
+                <td>20/03/2026</td>
+              </tr>
+              <tr class="table__row">
+                <td><a href="#">Endpoints API REST</a></td>
+                <td>API Reference</td>
+                <td>editeur1</td>
+                <td><span class="badge badge--review">En relecture</span></td>
+                <td>19/03/2026</td>
+              </tr>
+              <tr class="table__row">
+                <td><a href="#">Schema de la BDD</a></td>
+                <td>Architecture</td>
+                <td>auteur1</td>
+                <td><span class="badge badge--draft">Brouillon</span></td>
+                <td>18/03/2026</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <nav class="pagination">
+          <div class="pagination__item pagination__item--disabled">
+            <a class="pagination__link" href="#">&laquo;</a>
+          </div>
+          <div class="pagination__item pagination__item--active">
+            <a class="pagination__link" href="#">1</a>
+          </div>
+          <div class="pagination__item">
+            <a class="pagination__link" href="#">2</a>
+          </div>
+          <div class="pagination__item">
+            <a class="pagination__link" href="#">&raquo;</a>
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <footer class="footer">
+      CMS Wiki &mdash; Projet Semestriel 3A &mdash; Ecole Decode 2025-2026
+    </footer>
+  </body>
+</html>
