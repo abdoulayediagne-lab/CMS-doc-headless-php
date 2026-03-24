@@ -95,6 +95,19 @@ class UserRepository extends AbstractRepository {
 
         return $this->findById($id);
     }
+
+    public function deleteById(int $id): bool {
+        $query = 'DELETE FROM users WHERE id = :id';
+        $statement = $this->db->getConnexion()->prepare($query);
+
+        try {
+            $statement->execute(['id' => $id]);
+        } catch (\PDOException $exception) {
+            return false;
+        }
+
+        return $statement->rowCount() > 0;
+    }
 }
 
 ?>

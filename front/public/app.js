@@ -3,6 +3,10 @@
 
   const statusEl = document.getElementById("status");
   const gridEl = document.getElementById("docs-grid");
+  const searchForm = document.getElementById("search-form");
+  const searchInput = document.getElementById("search-input");
+
+  let searchQuery = "";
 
   function setStatus(message, variant) {
     statusEl.className = "alert alert--" + (variant || "info");
@@ -30,20 +34,34 @@
         const title = escapeHtml(doc.title || "Sans titre");
         const excerpt = escapeHtml((doc.content || "").slice(0, 140));
         const slug = escapeHtml(doc.slug || "");
+        const author = escapeHtml(doc.author_name || "Equipe Docs");
+        const status = escapeHtml(doc.status || "published");
+        const tags = Array.isArray(doc.tags)
+          ? doc.tags.map(function (tag) {
+              return '<span class="badge badge--primary">' + escapeHtml(tag) + "</span>";
+            }).join(" ")
+          : "";
         return (
-          '<article class="card" aria-label="Document ' +
+          '<article class="card public-page__doc" aria-label="Document ' +
           title +
+          '"><a class="public-page__doc-link" href="./document.html?slug=' +
+          encodeURIComponent(doc.slug || "") +
           '">' +
           '<div class="card__header"><h3 class="card__title">' +
           title +
-          "</h3></div>" +
+          '</h3><span class="badge badge--published">' +
+          status +
+          "</span></div>" +
           '<div class="card__body"><p>' +
           excerpt +
-          "...</p></div>" +
+          "...</p><div class=\"public-page__tags\">" +
+          tags +
+          "</div></div>" +
           '<div class="card__footer"><small class="text-muted">slug: ' +
           slug +
-          "</small></div>" +
-          "</article>"
+          " - auteur: " +
+          author +
+          "</small></div></a></article>"
         );
       })
       .join("");
@@ -54,7 +72,8 @@
 
   async function loadDocuments() {
     try {
-      const response = await fetch(API_BASE + "/public/documents?limit=12&page=1", {
+      const queryPart = searchQuery ? "&q=" + encodeURIComponent(searchQuery) : "";
+      const response = await fetch(API_BASE + "/public/documents?limit=12&page=1" + queryPart, {
         headers: { "Content-Type": "application/json" },
       });
 
@@ -66,8 +85,16 @@
       renderDocs(payload.data || []);
     } catch (error) {
       gridEl.innerHTML = "";
-      setStatus(error.message, "danger");
+      setStatus("Impossible de charger les documents: " + error.message, "danger");
     }
+  }
+
+  if (searchForm) {
+    searchForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      searchQuery = (searchInput && searchInput.value ? searchInput.value : "").trim();
+      loadDocuments();
+    });
   }
 
   loadDocuments();
