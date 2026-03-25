@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mentions legales - CMS Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+    />
+    <link rel="stylesheet" href="./main.css" />
+  </head>
+  <body>
+    <header class="navbar" role="banner">
+      <div class="container public-nav">
+        <div class="navbar__brand">Docs Entreprise</div>
+        <a class="btn btn--outline btn--sm" href="./index.html">Retour au site</a>
+      </div>
+    </header>
+
+    <main class="container public-page" role="main" aria-label="Mentions legales">
+      <section class="card" aria-labelledby="legal-title">
+        <div class="card__header">
+          <h1 id="legal-title" class="card__title">Mentions legales & RGPD</h1>
+        </div>
+        <div class="card__body">
+          <p>
+            Ce site de demonstration collecte uniquement les donnees necessaires
+            a l'authentification et a la gestion editoriale.
+          </p>
+          <p>
+            Cookies: seuls des cookies techniques et de preference sont utilises
+            pour le bon fonctionnement de l'interface.
+          </p>
+          <p>
+            Droit a l'effacement: un utilisateur connecte peut demander
+            l'effacement de son compte via l'endpoint API <strong>DELETE /me</strong>.
+            Le compte est anonymise et desactive.
+          </p>
+          <p>
+            Contact: equipe projet CMS headless.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      <div class="container">CMS headless - Mentions legales</div>
+    </footer>
+  </body>
+</html>
