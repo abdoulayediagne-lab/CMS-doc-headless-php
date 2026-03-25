@@ -5,6 +5,11 @@
   const gridEl = document.getElementById("docs-grid");
   const searchForm = document.getElementById("search-form");
   const searchInput = document.getElementById("search-input");
+  const cookieBanner = document.getElementById("cookie-banner");
+  const cookieAcceptBtn = document.getElementById("cookie-accept");
+  const cookieRejectBtn = document.getElementById("cookie-reject");
+
+  const COOKIE_CONSENT_KEY = "cms_cookie_consent";
 
   let searchQuery = "";
 
@@ -70,6 +75,32 @@
     setStatus(items.length + " document(s) charge(s).", "success");
   }
 
+  function getConsent() {
+    try {
+      return localStorage.getItem(COOKIE_CONSENT_KEY);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function setConsent(value) {
+    try {
+      localStorage.setItem(COOKIE_CONSENT_KEY, value);
+    } catch (error) {
+      // Ignore storage errors on restricted browsers.
+    }
+  }
+
+  function updateCookieBanner() {
+    if (!cookieBanner) {
+      return;
+    }
+
+    const consent = getConsent();
+    const mustDisplay = consent !== "accepted" && consent !== "rejected";
+    cookieBanner.hidden = !mustDisplay;
+  }
+
   async function loadDocuments() {
     try {
       const queryPart = searchQuery ? "&q=" + encodeURIComponent(searchQuery) : "";
@@ -97,5 +128,20 @@
     });
   }
 
+  if (cookieAcceptBtn) {
+    cookieAcceptBtn.addEventListener("click", function () {
+      setConsent("accepted");
+      updateCookieBanner();
+    });
+  }
+
+  if (cookieRejectBtn) {
+    cookieRejectBtn.addEventListener("click", function () {
+      setConsent("rejected");
+      updateCookieBanner();
+    });
+  }
+
+  updateCookieBanner();
   loadDocuments();
 })();

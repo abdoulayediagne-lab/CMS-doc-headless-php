@@ -108,6 +108,38 @@ class UserRepository extends AbstractRepository {
 
         return $statement->rowCount() > 0;
     }
+
+    public function anonymizeById(int $id): ?User {
+        $suffix = time() . '_' . $id;
+        $anonymizedUsername = 'deleted_user_' . $suffix;
+        $anonymizedEmail = 'deleted+' . $suffix . '@example.invalid';
+        $passwordHash = password_hash(bin2hex(random_bytes(16)), PASSWORD_BCRYPT);
+
+        $query = 'UPDATE users
+                  SET username = :username,
+                      email = :email,
+                      password_hash = :password_hash,
+                      role = :role,
+                      is_active = :is_active,
+                      updated_at = NOW()
+                  WHERE id = :id';
+
+        $statement = $this->db->getConnexion()->prepare($query);
+        $statement->execute([
+            'id' => $id,
+            'username' => $anonymizedUsername,
+            'email' => $anonymizedEmail,
+            'password_hash' => $passwordHash,
+            'role' => 'reader',
+            'is_active' => false,
+        ]);
+
+        if ($statement->rowCount() === 0) {
+            return null;
+        }
+
+        return $this->findById($id);
+    }
 }
 
 ?>

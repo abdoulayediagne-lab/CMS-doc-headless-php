@@ -25,6 +25,11 @@
     "controller": "Auth\\GetMeController"
   },
   {
+    "path": "/me",
+    "method": "DELETE",
+    "controller": "Auth\\DeleteMeController"
+  },
+  {
     "path": "/documents/:id/versions",
     "method": "GET",
     "controller": "Document\\GetDocumentVersionsController"
