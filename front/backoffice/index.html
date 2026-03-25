@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CMS Documentation - Backoffice</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+    />
     <link rel="stylesheet" href="./main.css" />
   </head>
   <body>
@@ -13,17 +16,47 @@
       <div class="container backoffice-nav">
         <div class="navbar__brand">Backoffice CMS</div>
         <nav class="backoffice-nav__menu" aria-label="Navigation backoffice">
-          <a id="nav-login" class="btn btn--outline btn--sm" href="#/login">Connexion</a>
-          <a id="nav-register" class="btn btn--outline btn--sm" href="#/register">Inscription</a>
-          <a id="nav-dashboard" class="btn btn--outline btn--sm" href="#/dashboard" hidden>Dashboard</a>
-          <a id="nav-documents" class="btn btn--outline btn--sm" href="#/documents" hidden>Documents</a>
-          <button id="logout-btn" class="btn btn--outline btn--sm" type="button" hidden>Deconnexion</button>
+          <a id="nav-login" class="btn btn--outline btn--sm" href="#/login"
+            >Connexion</a
+          >
+          <a
+            id="nav-register"
+            class="btn btn--outline btn--sm"
+            href="#/register"
+            >Inscription</a
+          >
+          <a
+            id="nav-dashboard"
+            class="btn btn--outline btn--sm"
+            href="#/dashboard"
+            hidden
+            >Dashboard</a
+          >
+          <a
+            id="nav-documents"
+            class="btn btn--outline btn--sm"
+            href="#/documents"
+            hidden
+            >Documents</a
+          >
+          <button
+            id="logout-btn"
+            class="btn btn--outline btn--sm"
+            type="button"
+            hidden
+          >
+            Deconnexion
+          </button>
         </nav>
       </div>
     </header>
 
     <main class="container backoffice-page" role="main" aria-label="Backoffice">
-      <section id="view-login" class="card backoffice-page__panel" aria-labelledby="login-title">
+      <section
+        id="view-login"
+        class="card backoffice-page__panel"
+        aria-labelledby="login-title"
+      >
         <div class="card__header">
           <h1 id="login-title" class="card__title">Connexion</h1>
         </div>
@@ -31,11 +64,24 @@
           <form id="login-form" class="form" novalidate>
             <div class="form__group">
               <label class="form__label" for="email">Email</label>
-              <input class="form__input" id="email" name="email" type="email" required />
+              <input
+                class="form__input"
+                id="email"
+                name="email"
+                type="email"
+                required
+              />
             </div>
             <div class="form__group">
               <label class="form__label" for="password">Mot de passe</label>
-              <input class="form__input" id="password" name="password" type="password" required minlength="8" />
+              <input
+                class="form__input"
+                id="password"
+                name="password"
+                type="password"
+                required
+                minlength="8"
+              />
             </div>
             <button class="btn btn--primary" type="submit">Se connecter</button>
           </form>
@@ -43,27 +89,63 @@
             Pas encore de compte ?
             <a href="#/register">Creer un compte</a>
           </p>
-          <div id="auth-status" class="alert alert--info backoffice-page__status" role="status" aria-live="polite">Non connecte.</div>
+          <div
+            id="auth-status"
+            class="alert alert--info backoffice-page__status"
+            role="status"
+            aria-live="polite"
+          >
+            Non connecte.
+          </div>
         </div>
       </section>
 
-      <section id="view-register" class="card backoffice-page__panel" aria-labelledby="register-title" hidden>
+      <section
+        id="view-register"
+        class="card backoffice-page__panel"
+        aria-labelledby="register-title"
+        hidden
+      >
         <div class="card__header">
           <h1 id="register-title" class="card__title">Inscription</h1>
         </div>
         <div class="card__body">
           <form id="register-form" class="form" novalidate>
             <div class="form__group">
-              <label class="form__label" for="register-username">Nom d'utilisateur</label>
-              <input class="form__input" id="register-username" name="username" type="text" required minlength="2" />
+              <label class="form__label" for="register-username"
+                >Nom d'utilisateur</label
+              >
+              <input
+                class="form__input"
+                id="register-username"
+                name="username"
+                type="text"
+                required
+                minlength="2"
+              />
             </div>
             <div class="form__group">
               <label class="form__label" for="register-email">Email</label>
-              <input class="form__input" id="register-email" name="email" type="email" required />
+              <input
+                class="form__input"
+                id="register-email"
+                name="email"
+                type="email"
+                required
+              />
             </div>
             <div class="form__group">
-              <label class="form__label" for="register-password">Mot de passe</label>
-              <input class="form__input" id="register-password" name="password" type="password" required minlength="8" />
+              <label class="form__label" for="register-password"
+                >Mot de passe</label
+              >
+              <input
+                class="form__input"
+                id="register-password"
+                name="password"
+                type="password"
+                required
+                minlength="8"
+              />
             </div>
             <button class="btn btn--primary" type="submit">S'inscrire</button>
           </form>
@@ -71,31 +153,166 @@
             Deja un compte ?
             <a href="#/login">Se connecter</a>
           </p>
-          <div id="register-status" class="alert alert--info backoffice-page__status" role="status" aria-live="polite">Remplis le formulaire pour creer ton compte.</div>
+          <div
+            id="register-status"
+            class="alert alert--info backoffice-page__status"
+            role="status"
+            aria-live="polite"
+          >
+            Remplis le formulaire pour creer ton compte.
+          </div>
         </div>
       </section>
 
-      <section id="view-dashboard" class="card backoffice-page__panel" aria-labelledby="dashboard-title" hidden>
+      <section
+        id="view-dashboard"
+        class="card backoffice-page__panel"
+        aria-labelledby="dashboard-title"
+        hidden
+      >
         <div class="card__header backoffice-page__header-row">
           <h1 id="dashboard-title" class="card__title">Dashboard</h1>
           <span id="current-user" class="badge badge--info">Non connecte</span>
         </div>
         <div class="card__body">
-          <p id="dashboard-intro" class="text-muted">Connecte-toi pour charger ton espace.</p>
-          <div id="dashboard-alert" class="alert alert--info">Selectionne une vue via le menu.</div>
+          <p id="dashboard-intro" class="text-muted">
+            Connecte-toi pour charger ton espace.
+          </p>
+          <div id="dashboard-alert" class="alert alert--info">
+            Selectionne une vue via le menu.
+          </div>
 
-          <section id="dashboard-admin" class="backoffice-page__subpanel" hidden>
+          <section
+            id="dashboard-role-panel"
+            class="card backoffice-page__subpanel"
+            hidden
+          >
+            <div class="card__header">
+              <h3 id="dashboard-role-title" class="card__title">
+                Espace utilisateur
+              </h3>
+            </div>
+            <div class="card__body">
+              <p id="dashboard-role-description" class="text-muted">
+                Choisis une action rapide.
+              </p>
+
+              <div class="backoffice-page__role-actions">
+                <a
+                  id="dashboard-open-documents"
+                  class="btn btn--outline"
+                  href="#/documents"
+                  >Voir les documents</a
+                >
+                <a
+                  id="dashboard-open-public"
+                  class="btn btn--primary"
+                  href="http://localhost:5173"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  hidden
+                  >Voir les documents publics</a
+                >
+              </div>
+
+              <form
+                id="dashboard-quick-create-form"
+                class="form backoffice-page__quick-form"
+                novalidate
+                hidden
+              >
+                <div class="form__group">
+                  <label class="form__label" for="quick-document-title"
+                    >Titre</label
+                  >
+                  <input
+                    id="quick-document-title"
+                    class="form__input"
+                    type="text"
+                    required
+                  />
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="quick-document-slug"
+                    >Slug</label
+                  >
+                  <input
+                    id="quick-document-slug"
+                    class="form__input"
+                    type="text"
+                    placeholder="auto si vide"
+                  />
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="quick-document-status"
+                    >Statut</label
+                  >
+                  <select id="quick-document-status" class="form__select">
+                    <option value="draft">draft</option>
+                    <option value="review">review</option>
+                    <option value="published">published</option>
+                    <option value="archived">archived</option>
+                  </select>
+                </div>
+                <div class="form__group">
+                  <label class="form__label" for="quick-document-tags"
+                    >Tags</label
+                  >
+                  <input
+                    id="quick-document-tags"
+                    class="form__input"
+                    type="text"
+                    placeholder="guide, onboarding"
+                  />
+                </div>
+                <div class="form__group backoffice-page__quick-form-content">
+                  <label class="form__label" for="quick-document-content"
+                    >Contenu</label
+                  >
+                  <textarea
+                    id="quick-document-content"
+                    class="form__textarea"
+                    rows="6"
+                  ></textarea>
+                </div>
+                <button class="btn btn--primary" type="submit">
+                  Creer le document
+                </button>
+              </form>
+
+              <div
+                id="dashboard-quick-create-status"
+                class="alert alert--info backoffice-page__status"
+                hidden
+              >
+                Formulaire de creation rapide.
+              </div>
+            </div>
+          </section>
+
+          <section
+            id="dashboard-admin"
+            class="backoffice-page__subpanel"
+            hidden
+          >
             <div class="backoffice-page__stats">
               <article class="card">
                 <div class="card__body">
                   <p class="text-muted m-0">Utilisateurs</p>
-                  <p id="admin-users-count" class="backoffice-page__stat-value">-</p>
+                  <p id="admin-users-count" class="backoffice-page__stat-value">
+                    -
+                  </p>
                 </div>
               </article>
               <article class="card">
                 <div class="card__body">
                   <p class="text-muted m-0">Documents</p>
-                  <p id="admin-documents-count" class="backoffice-page__stat-value">-</p>
+                  <p
+                    id="admin-documents-count"
+                    class="backoffice-page__stat-value"
+                  >
+                    -
+                  </p>
                 </div>
               </article>
             </div>
@@ -105,7 +322,13 @@
             <section class="backoffice-page__subpanel">
               <div class="backoffice-page__header-row mb-md">
                 <h3 class="m-0">Utilisateurs</h3>
-                <button id="load-users-btn" class="btn btn--secondary" type="button">Charger</button>
+                <button
+                  id="load-users-btn"
+                  class="btn btn--secondary"
+                  type="button"
+                >
+                  Charger
+                </button>
               </div>
               <div class="table-wrapper">
                 <table class="table" aria-label="Liste des utilisateurs">
@@ -127,11 +350,32 @@
             <section class="backoffice-page__subpanel">
               <div class="backoffice-page__header-row mb-md">
                 <h3 class="m-0">Tags</h3>
-                <button id="load-tags-btn" class="btn btn--secondary" type="button">Charger</button>
+                <button
+                  id="load-tags-btn"
+                  class="btn btn--secondary"
+                  type="button"
+                >
+                  Charger
+                </button>
               </div>
-              <form id="tag-create-form" class="form backoffice-page__inline-form" novalidate>
-                <input id="tag-create-name" class="form__input" type="text" placeholder="Nom tag" required />
-                <input id="tag-create-slug" class="form__input" type="text" placeholder="Slug (optionnel)" />
+              <form
+                id="tag-create-form"
+                class="form backoffice-page__inline-form"
+                novalidate
+              >
+                <input
+                  id="tag-create-name"
+                  class="form__input"
+                  type="text"
+                  placeholder="Nom tag"
+                  required
+                />
+                <input
+                  id="tag-create-slug"
+                  class="form__input"
+                  type="text"
+                  placeholder="Slug (optionnel)"
+                />
                 <button class="btn btn--primary" type="submit">Ajouter</button>
               </form>
               <div class="table-wrapper">
@@ -152,12 +396,39 @@
             <section class="backoffice-page__subpanel">
               <div class="backoffice-page__header-row mb-md">
                 <h3 class="m-0">Sections</h3>
-                <button id="load-sections-btn" class="btn btn--secondary" type="button">Charger</button>
+                <button
+                  id="load-sections-btn"
+                  class="btn btn--secondary"
+                  type="button"
+                >
+                  Charger
+                </button>
               </div>
-              <form id="section-create-form" class="form backoffice-page__inline-form" novalidate>
-                <input id="section-create-name" class="form__input" type="text" placeholder="Nom section" required />
-                <input id="section-create-slug" class="form__input" type="text" placeholder="Slug (optionnel)" />
-                <input id="section-create-parent" class="form__input" type="number" min="1" placeholder="Parent ID" />
+              <form
+                id="section-create-form"
+                class="form backoffice-page__inline-form"
+                novalidate
+              >
+                <input
+                  id="section-create-name"
+                  class="form__input"
+                  type="text"
+                  placeholder="Nom section"
+                  required
+                />
+                <input
+                  id="section-create-slug"
+                  class="form__input"
+                  type="text"
+                  placeholder="Slug (optionnel)"
+                />
+                <input
+                  id="section-create-parent"
+                  class="form__input"
+                  type="number"
+                  min="1"
+                  placeholder="Parent ID"
+                />
                 <button class="btn btn--primary" type="submit">Ajouter</button>
               </form>
               <div class="table-wrapper">
@@ -179,7 +450,13 @@
             <section class="backoffice-page__subpanel">
               <div class="backoffice-page__header-row mb-md">
                 <h3 class="m-0">Audit logs</h3>
-                <button id="load-logs-btn" class="btn btn--secondary" type="button">Charger</button>
+                <button
+                  id="load-logs-btn"
+                  class="btn btn--secondary"
+                  type="button"
+                >
+                  Charger
+                </button>
               </div>
               <div class="table-wrapper">
                 <table class="table" aria-label="Liste des logs">
@@ -200,16 +477,36 @@
         </div>
       </section>
 
-      <section id="view-documents" class="card backoffice-page__panel" aria-labelledby="documents-title" hidden>
+      <section
+        id="view-documents"
+        class="card backoffice-page__panel"
+        aria-labelledby="documents-title"
+        hidden
+      >
         <div class="card__header backoffice-page__header-row">
           <h2 id="documents-title" class="card__title">Documents</h2>
-          <button id="refresh-documents-btn" class="btn btn--secondary" type="button">Rafraichir</button>
+          <button
+            id="refresh-documents-btn"
+            class="btn btn--secondary"
+            type="button"
+          >
+            Rafraichir
+          </button>
         </div>
         <div class="card__body">
-          <form id="documents-filter-form" class="form backoffice-page__filters" novalidate>
+          <form
+            id="documents-filter-form"
+            class="form backoffice-page__filters"
+            novalidate
+          >
             <div class="form__group">
               <label class="form__label" for="doc-search">Recherche</label>
-              <input id="doc-search" class="form__input" type="search" placeholder="Titre ou contenu" />
+              <input
+                id="doc-search"
+                class="form__input"
+                type="search"
+                placeholder="Titre ou contenu"
+              />
             </div>
             <div class="form__group">
               <label class="form__label" for="doc-status-filter">Statut</label>
@@ -222,7 +519,9 @@
               </select>
             </div>
             <div class="form__group">
-              <label class="form__label" for="doc-section-filter">Section</label>
+              <label class="form__label" for="doc-section-filter"
+                >Section</label
+              >
               <select id="doc-section-filter" class="form__select">
                 <option value="">Toutes</option>
               </select>
@@ -236,7 +535,14 @@
             <button class="btn btn--primary" type="submit">Appliquer</button>
           </form>
 
-          <div id="documents-status" class="alert alert--info" role="status" aria-live="polite">Charge les documents.</div>
+          <div
+            id="documents-status"
+            class="alert alert--info"
+            role="status"
+            aria-live="polite"
+          >
+            Charge les documents.
+          </div>
           <div class="table-wrapper">
             <table class="table" aria-label="Liste des documents">
               <thead>
@@ -253,39 +559,76 @@
             </table>
           </div>
 
-          <section id="document-detail" class="card backoffice-page__subpanel" hidden>
+          <section
+            id="document-detail"
+            class="card backoffice-page__subpanel"
+            hidden
+          >
             <div class="card__header">
               <h3 class="card__title">Lecture detaillee</h3>
             </div>
             <div class="card__body">
               <h4 id="document-detail-title" class="m-0">-</h4>
               <p id="document-detail-meta" class="text-muted"></p>
-              <div id="document-detail-content" class="backoffice-page__detail-content"></div>
+              <div
+                id="document-detail-content"
+                class="backoffice-page__detail-content"
+              ></div>
             </div>
           </section>
 
-          <section id="document-editor" class="card backoffice-page__subpanel" hidden>
+          <section
+            id="document-editor"
+            class="card backoffice-page__subpanel"
+            hidden
+          >
             <div class="card__header backoffice-page__header-row">
-              <h3 id="document-editor-title" class="card__title">Nouveau document</h3>
-              <button id="document-editor-reset" class="btn btn--outline btn--sm" type="button">Reinitialiser</button>
+              <h3 id="document-editor-title" class="card__title">
+                Nouveau document
+              </h3>
+              <button
+                id="document-editor-reset"
+                class="btn btn--outline btn--sm"
+                type="button"
+              >
+                Reinitialiser
+              </button>
             </div>
             <div class="card__body">
               <form id="document-form" class="form" novalidate>
                 <input id="document-id" type="hidden" />
                 <div class="form__group">
                   <label class="form__label" for="document-title">Titre</label>
-                  <input id="document-title" class="form__input" type="text" required />
+                  <input
+                    id="document-title"
+                    class="form__input"
+                    type="text"
+                    required
+                  />
                 </div>
                 <div class="form__group">
                   <label class="form__label" for="document-slug">Slug</label>
-                  <input id="document-slug" class="form__input" type="text" placeholder="auto si vide" />
+                  <input
+                    id="document-slug"
+                    class="form__input"
+                    type="text"
+                    placeholder="auto si vide"
+                  />
                 </div>
                 <div class="form__group">
-                  <label class="form__label" for="document-content">Contenu</label>
-                  <textarea id="document-content" class="form__textarea" rows="8"></textarea>
+                  <label class="form__label" for="document-content"
+                    >Contenu</label
+                  >
+                  <textarea
+                    id="document-content"
+                    class="form__textarea"
+                    rows="8"
+                  ></textarea>
                 </div>
                 <div class="form__group">
-                  <label class="form__label" for="document-status">Statut</label>
+                  <label class="form__label" for="document-status"
+                    >Statut</label
+                  >
                   <select id="document-status" class="form__select">
                     <option value="draft">draft</option>
                     <option value="review">review</option>
@@ -294,26 +637,57 @@
                   </select>
                 </div>
                 <div class="form__group">
-                  <label class="form__label" for="document-section">Section</label>
+                  <label class="form__label" for="document-section"
+                    >Section</label
+                  >
                   <select id="document-section" class="form__select">
                     <option value="">Aucune</option>
                   </select>
                 </div>
                 <div class="form__group">
                   <label class="form__label" for="document-tags">Tags</label>
-                  <input id="document-tags" class="form__input" type="text" placeholder="guide, onboarding, api" />
+                  <input
+                    id="document-tags"
+                    class="form__input"
+                    type="text"
+                    placeholder="guide, onboarding, api"
+                  />
                 </div>
                 <div class="form__group">
-                  <label class="form__label" for="document-meta-title">Meta title</label>
-                  <input id="document-meta-title" class="form__input" type="text" />
+                  <label class="form__label" for="document-meta-title"
+                    >Meta title</label
+                  >
+                  <input
+                    id="document-meta-title"
+                    class="form__input"
+                    type="text"
+                  />
                 </div>
                 <div class="form__group">
-                  <label class="form__label" for="document-meta-description">Meta description</label>
-                  <textarea id="document-meta-description" class="form__textarea" rows="3"></textarea>
+                  <label class="form__label" for="document-meta-description"
+                    >Meta description</label
+                  >
+                  <textarea
+                    id="document-meta-description"
+                    class="form__textarea"
+                    rows="3"
+                  ></textarea>
                 </div>
-                <button id="document-submit" class="btn btn--primary" type="submit">Enregistrer</button>
+                <button
+                  id="document-submit"
+                  class="btn btn--primary"
+                  type="submit"
+                >
+                  Enregistrer
+                </button>
               </form>
-              <div id="document-form-status" class="alert alert--info backoffice-page__status">Le formulaire est reserve aux editeurs et admins.</div>
+              <div
+                id="document-form-status"
+                class="alert alert--info backoffice-page__status"
+              >
+                Creation reservee aux editeurs/admins. Les auteurs peuvent
+                modifier leurs documents existants.
+              </div>
             </div>
           </section>
         </div>

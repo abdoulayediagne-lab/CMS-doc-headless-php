@@ -9,6 +9,45 @@
   border-radius: var(--border-radius);
   overflow: hidden;
 
+  thead th {
+    padding: 0.875rem $spacing-md;
+    text-align: left;
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg-secondary);
+  }
+
+  tbody td {
+    padding: 0.875rem $spacing-md;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: color-mix(
+      in srgb,
+      var(--color-bg-secondary) 45%,
+      transparent
+    );
+  }
+
+  td {
+    .form__input,
+    .form__select {
+      min-width: 110px;
+    }
+
+    .form__input {
+      padding: 0.375rem 0.625rem;
+    }
+  }
+
   &__header {
     background-color: var(--color-bg-secondary);
 

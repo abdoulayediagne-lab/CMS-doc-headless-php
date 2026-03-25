@@ -1,5 +1,6 @@
 ﻿(function () {
   const API_BASE = window.API_BASE_URL || "http://localhost:8080";
+  const PUBLIC_FRONT_URL = window.PUBLIC_FRONT_URL || "http://localhost:5173";
   const TOKEN_KEY = "cms_access_token";
   const DOCUMENT_STATUSES = ["draft", "review", "published", "archived"];
 
@@ -19,6 +20,28 @@
   const registerStatus = document.getElementById("register-status");
   const dashboardAlert = document.getElementById("dashboard-alert");
   const dashboardIntro = document.getElementById("dashboard-intro");
+  const dashboardRolePanel = document.getElementById("dashboard-role-panel");
+  const dashboardRoleTitle = document.getElementById("dashboard-role-title");
+  const dashboardRoleDescription = document.getElementById(
+    "dashboard-role-description",
+  );
+  const dashboardOpenDocuments = document.getElementById(
+    "dashboard-open-documents",
+  );
+  const dashboardOpenPublic = document.getElementById("dashboard-open-public");
+  const dashboardQuickCreateForm = document.getElementById(
+    "dashboard-quick-create-form",
+  );
+  const dashboardQuickCreateStatus = document.getElementById(
+    "dashboard-quick-create-status",
+  );
+  const quickDocumentTitle = document.getElementById("quick-document-title");
+  const quickDocumentSlug = document.getElementById("quick-document-slug");
+  const quickDocumentStatus = document.getElementById("quick-document-status");
+  const quickDocumentTags = document.getElementById("quick-document-tags");
+  const quickDocumentContent = document.getElementById(
+    "quick-document-content",
+  );
   const documentsStatus = document.getElementById("documents-status");
   const adminStatus = document.getElementById("admin-status");
   const documentFormStatus = document.getElementById("document-form-status");
@@ -54,7 +77,9 @@
   const documentDetail = document.getElementById("document-detail");
   const documentDetailTitle = document.getElementById("document-detail-title");
   const documentDetailMeta = document.getElementById("document-detail-meta");
-  const documentDetailContent = document.getElementById("document-detail-content");
+  const documentDetailContent = document.getElementById(
+    "document-detail-content",
+  );
 
   const documentEditor = document.getElementById("document-editor");
   const documentEditorTitle = document.getElementById("document-editor-title");
@@ -67,7 +92,9 @@
   const documentSectionInput = document.getElementById("document-section");
   const documentTagsInput = document.getElementById("document-tags");
   const documentMetaTitleInput = document.getElementById("document-meta-title");
-  const documentMetaDescriptionInput = document.getElementById("document-meta-description");
+  const documentMetaDescriptionInput = document.getElementById(
+    "document-meta-description",
+  );
 
   let currentUser = null;
   let knownTags = [];
@@ -112,8 +139,18 @@
     return isAuthenticated() && currentUser.role === "admin";
   }
 
-  function canEditDocuments() {
-    return isAuthenticated() && (currentUser.role === "admin" || currentUser.role === "editor");
+  function canCreateDocuments() {
+    return (
+      isAuthenticated() &&
+      (currentUser.role === "admin" || currentUser.role === "editor")
+    );
+  }
+
+  function canUseDocumentEditor() {
+    return (
+      isAuthenticated() &&
+      ["admin", "editor", "author"].indexOf(currentUser.role) >= 0
+    );
   }
 
   function canEditDocument(doc) {
@@ -123,11 +160,16 @@
     if (currentUser.role === "admin") {
       return true;
     }
-    return currentUser.role === "editor" && Number(doc.author_id) === Number(currentUser.id);
+    return (
+      ["editor", "author"].indexOf(currentUser.role) >= 0 &&
+      Number(doc.author_id) === Number(currentUser.id)
+    );
   }
 
   function setRoute(route) {
-    const normalized = route.startsWith("#/") ? route : "#/" + route.replace(/^\//, "");
+    const normalized = route.startsWith("#/")
+      ? route
+      : "#/" + route.replace(/^\//, "");
     if (window.location.hash !== normalized) {
       window.location.hash = normalized;
       return;
@@ -137,12 +179,18 @@
 
   async function api(path, options) {
     const token = getToken();
-    const headers = Object.assign({ "Content-Type": "application/json" }, (options && options.headers) || {});
+    const headers = Object.assign(
+      { "Content-Type": "application/json" },
+      (options && options.headers) || {},
+    );
     if (token) {
       headers.Authorization = "Bearer " + token;
     }
 
-    const response = await fetch(API_BASE + path, Object.assign({}, options, { headers }));
+    const response = await fetch(
+      API_BASE + path,
+      Object.assign({}, options, { headers }),
+    );
     const text = await response.text();
     let payload = {};
 
@@ -153,7 +201,7 @@
     }
 
     if (!response.ok) {
-      throw new Error(payload.error || ("HTTP " + response.status));
+      throw new Error(payload.error || "HTTP " + response.status);
     }
 
     return payload;
@@ -179,7 +227,10 @@
   function renderRoute() {
     let hash = window.location.hash || "#/login";
 
-    if (!isAuthenticated() && (hash === "#/dashboard" || hash === "#/documents")) {
+    if (
+      !isAuthenticated() &&
+      (hash === "#/dashboard" || hash === "#/documents")
+    ) {
       hash = "#/login";
       window.location.hash = hash;
     }
@@ -220,45 +271,144 @@
       dashboardIntro.textContent = "Connecte-toi pour charger ton espace.";
       setAlert(dashboardAlert, "info", "Selectionne une vue via le menu.");
       dashboardAdmin.hidden = true;
+      dashboardRolePanel.hidden = true;
       return;
     }
 
-    dashboardIntro.textContent = "Bienvenue " + (currentUser.username || currentUser.email || "utilisateur") + " (" + currentUser.role + ").";
-    currentUserBadge.textContent = (currentUser.username || currentUser.email || "utilisateur") + " - " + currentUser.role;
+    dashboardIntro.textContent =
+      "Bienvenue " +
+      (currentUser.username || currentUser.email || "utilisateur") +
+      " (" +
+      currentUser.role +
+      ").";
+    currentUserBadge.textContent =
+      (currentUser.username || currentUser.email || "utilisateur") +
+      " - " +
+      currentUser.role;
+    dashboardOpenPublic.href = PUBLIC_FRONT_URL;
+
+    dashboardRolePanel.hidden = false;
+    dashboardOpenDocuments.hidden = false;
+    dashboardOpenPublic.hidden = true;
+    dashboardQuickCreateForm.hidden = true;
+    dashboardQuickCreateStatus.hidden = true;
 
     if (isAdmin()) {
       dashboardAdmin.hidden = false;
-      setAlert(dashboardAlert, "success", "Tu as acces aux outils d'administration ci-dessous.");
+      setAlert(
+        dashboardAlert,
+        "success",
+        "Tu as acces aux outils d'administration ci-dessous.",
+      );
       setAlert(adminStatus, "info", "Gestion admin active.");
+      dashboardRoleTitle.textContent = "Actions rapides";
+      dashboardRoleDescription.textContent =
+        "Tu peux gerer le backoffice et creer rapidement un document.";
+      dashboardQuickCreateForm.hidden = false;
+      dashboardQuickCreateStatus.hidden = false;
+      setAlert(
+        dashboardQuickCreateStatus,
+        "info",
+        "Formulaire rapide actif pour creer un document.",
+      );
       loadAdminStats();
+    } else if (currentUser.role === "editor") {
+      dashboardAdmin.hidden = true;
+      setAlert(
+        dashboardAlert,
+        "info",
+        "Tu peux gerer tes documents depuis ce dashboard ou l'onglet Documents.",
+      );
+      dashboardRoleTitle.textContent = "Creation rapide";
+      dashboardRoleDescription.textContent =
+        "Creer un document ici, puis gere la liste detaillee dans l'onglet Documents.";
+      dashboardQuickCreateForm.hidden = false;
+      dashboardQuickCreateStatus.hidden = false;
+      setAlert(
+        dashboardQuickCreateStatus,
+        "info",
+        "Tu peux creer des documents et modifier les tiens.",
+      );
+    } else if (currentUser.role === "author") {
+      dashboardAdmin.hidden = true;
+      setAlert(
+        dashboardAlert,
+        "info",
+        "Role auteur: edition limitee aux documents dont tu es proprietaire.",
+      );
+      dashboardRoleTitle.textContent = "Navigation auteur";
+      dashboardRoleDescription.textContent =
+        "Ce role ne cree pas de nouveau document ici. Utilise l'onglet Documents pour consulter le contenu disponible.";
     } else {
       dashboardAdmin.hidden = true;
-      setAlert(dashboardAlert, "info", "Compte non admin: utilise l'onglet Documents.");
+      setAlert(
+        dashboardAlert,
+        "info",
+        "Compte lecteur: acces en lecture uniquement.",
+      );
+      dashboardRoleTitle.textContent = "Acces lecture";
+      dashboardRoleDescription.textContent =
+        "Tu n'as pas de droits CRUD dans le backoffice. Ouvre la vitrine publique pour lire les documents.";
+      dashboardOpenDocuments.hidden = true;
+      dashboardOpenPublic.hidden = false;
     }
+  }
+
+  async function saveDocument(payload, documentId) {
+    if (documentId) {
+      await api("/documents/" + documentId, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+      return;
+    }
+
+    await api("/documents", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
   }
 
   function renderTaxonomySelectors() {
     docSectionFilter.innerHTML = ['<option value="">Toutes</option>']
       .concat(
         knownSections.map(function (section) {
-          return '<option value="' + section.id + '">' + escapeHtml(section.name || section.slug || ("#" + section.id)) + "</option>";
-        })
+          return (
+            '<option value="' +
+            section.id +
+            '">' +
+            escapeHtml(section.name || section.slug || "#" + section.id) +
+            "</option>"
+          );
+        }),
       )
       .join("");
 
     documentSectionInput.innerHTML = ['<option value="">Aucune</option>']
       .concat(
         knownSections.map(function (section) {
-          return '<option value="' + section.id + '">' + escapeHtml(section.name || section.slug || ("#" + section.id)) + "</option>";
-        })
+          return (
+            '<option value="' +
+            section.id +
+            '">' +
+            escapeHtml(section.name || section.slug || "#" + section.id) +
+            "</option>"
+          );
+        }),
       )
       .join("");
 
     docTagFilter.innerHTML = ['<option value="">Tous</option>']
       .concat(
         knownTags.map(function (tag) {
-          return '<option value="' + escapeHtml(tag.slug) + '">' + escapeHtml(tag.name || tag.slug) + "</option>";
-        })
+          return (
+            '<option value="' +
+            escapeHtml(tag.slug) +
+            '">' +
+            escapeHtml(tag.name || tag.slug) +
+            "</option>"
+          );
+        }),
       )
       .join("");
   }
@@ -279,7 +429,13 @@
 
   function statusBadge(status) {
     const safe = DOCUMENT_STATUSES.indexOf(status) >= 0 ? status : "info";
-    return '<span class="badge badge--' + safe + '">' + escapeHtml(status || "-") + "</span>";
+    return (
+      '<span class="badge badge--' +
+      safe +
+      '">' +
+      escapeHtml(status || "-") +
+      "</span>"
+    );
   }
 
   function parseTags(value) {
@@ -306,42 +462,85 @@
 
     documentsBody.innerHTML = items
       .map(function (doc) {
-        const tags = Array.isArray(doc.tags) && doc.tags.length > 0 ? doc.tags.join(", ") : "-";
-        const actions = ['<button class="btn btn--outline btn--sm" type="button" data-action="view" data-id="' + doc.id + '">Lire</button>'];
+        const tags =
+          Array.isArray(doc.tags) && doc.tags.length > 0
+            ? doc.tags.join(", ")
+            : "-";
+        const actions = [
+          '<button class="btn btn--outline btn--sm" type="button" data-action="view" data-id="' +
+            doc.id +
+            '">Lire</button>',
+        ];
 
         if (canEditDocument(doc)) {
-          actions.push('<button class="btn btn--secondary btn--sm" type="button" data-action="edit" data-id="' + doc.id + '">Modifier</button>');
+          actions.push(
+            '<button class="btn btn--secondary btn--sm" type="button" data-action="edit" data-id="' +
+              doc.id +
+              '">Modifier</button>',
+          );
         }
 
         if (isAdmin()) {
-          actions.push('<button class="btn btn--danger btn--sm" type="button" data-action="delete" data-id="' + doc.id + '">Supprimer</button>');
+          actions.push(
+            '<button class="btn btn--danger btn--sm" type="button" data-action="delete" data-id="' +
+              doc.id +
+              '">Supprimer</button>',
+          );
         }
 
         return (
           "<tr>" +
-          "<td>" + doc.id + "</td>" +
-          "<td>" + escapeHtml(doc.title || "-") + "</td>" +
-          "<td>" + escapeHtml(doc.author_name || "-") + "</td>" +
-          "<td>" + statusBadge(doc.status) + "</td>" +
-          "<td>" + escapeHtml(tags) + "</td>" +
-          '<td class="backoffice-page__row-actions">' + actions.join(" ") + "</td>" +
+          "<td>" +
+          doc.id +
+          "</td>" +
+          "<td>" +
+          escapeHtml(doc.title || "-") +
+          "</td>" +
+          "<td>" +
+          escapeHtml(doc.author_name || "-") +
+          "</td>" +
+          "<td>" +
+          statusBadge(doc.status) +
+          "</td>" +
+          "<td>" +
+          escapeHtml(tags) +
+          "</td>" +
+          '<td class="backoffice-page__row-actions">' +
+          actions.join(" ") +
+          "</td>" +
           "</tr>"
         );
       })
       .join("");
 
-    setAlert(documentsStatus, "success", items.length + " document(s) charge(s).");
+    setAlert(
+      documentsStatus,
+      "success",
+      items.length + " document(s) charge(s).",
+    );
   }
 
   async function loadDocumentDetail(id) {
     try {
       const payload = await api("/documents/" + id, { method: "GET" });
       documentDetailTitle.textContent = payload.title || "Sans titre";
-      documentDetailMeta.textContent = "Slug: " + (payload.slug || "-") + " | Statut: " + (payload.status || "-") + " | MAJ: " + (payload.updated_at || "-");
-      documentDetailContent.innerHTML = escapeHtml(payload.content || "").replace(/\n/g, "<br>");
+      documentDetailMeta.textContent =
+        "Slug: " +
+        (payload.slug || "-") +
+        " | Statut: " +
+        (payload.status || "-") +
+        " | MAJ: " +
+        (payload.updated_at || "-");
+      documentDetailContent.innerHTML = escapeHtml(
+        payload.content || "",
+      ).replace(/\n/g, "<br>");
       documentDetail.hidden = false;
     } catch (error) {
-      setAlert(documentsStatus, "danger", "Impossible de charger le detail: " + error.message);
+      setAlert(
+        documentsStatus,
+        "danger",
+        "Impossible de charger le detail: " + error.message,
+      );
     }
   }
 
@@ -350,14 +549,22 @@
     documentForm.reset();
     documentStatusInput.value = "draft";
     documentEditorTitle.textContent = "Nouveau document";
-    setAlert(documentFormStatus, "info", "Cree un document ou modifie un document existant.");
+    setAlert(
+      documentFormStatus,
+      "info",
+      "Creation reservee aux editeurs/admins. Les auteurs peuvent modifier leurs documents existants.",
+    );
   }
 
   async function openDocumentForEdit(id) {
     try {
       const payload = await api("/documents/" + id, { method: "GET" });
       if (!canEditDocument(payload)) {
-        setAlert(documentsStatus, "warning", "Tu ne peux modifier que tes documents.");
+        setAlert(
+          documentsStatus,
+          "warning",
+          "Tu ne peux modifier que tes documents.",
+        );
         return;
       }
 
@@ -367,14 +574,24 @@
       documentContentInput.value = payload.content || "";
       documentStatusInput.value = payload.status || "draft";
       documentSectionInput.value = payload.section_id || "";
-      documentTagsInput.value = Array.isArray(payload.tags) ? payload.tags.join(", ") : "";
+      documentTagsInput.value = Array.isArray(payload.tags)
+        ? payload.tags.join(", ")
+        : "";
       documentMetaTitleInput.value = payload.meta_title || "";
       documentMetaDescriptionInput.value = payload.meta_description || "";
       documentEditorTitle.textContent = "Edition document #" + payload.id;
-      setAlert(documentFormStatus, "info", "Document charge dans le formulaire.");
+      setAlert(
+        documentFormStatus,
+        "info",
+        "Document charge dans le formulaire.",
+      );
       documentEditor.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (error) {
-      setAlert(documentsStatus, "danger", "Impossible de charger le document: " + error.message);
+      setAlert(
+        documentsStatus,
+        "danger",
+        "Impossible de charger le document: " + error.message,
+      );
     }
   }
 
@@ -400,11 +617,17 @@
         params.set("tag", docTagFilter.value);
       }
 
-      const payload = await api("/documents?" + params.toString(), { method: "GET" });
+      const payload = await api("/documents?" + params.toString(), {
+        method: "GET",
+      });
       renderDocuments(payload.data || []);
     } catch (error) {
       documentsBody.innerHTML = "";
-      setAlert(documentsStatus, "danger", "Impossible de charger: " + error.message);
+      setAlert(
+        documentsStatus,
+        "danger",
+        "Impossible de charger: " + error.message,
+      );
     }
   }
 
@@ -419,30 +642,60 @@
       .map(function (user) {
         return (
           "<tr>" +
-          "<td>" + user.id + "</td>" +
-          "<td>" + escapeHtml(user.username) + "</td>" +
-          "<td>" + escapeHtml(user.email) + "</td>" +
-          "<td><select class=\"form__select\" data-user-role=\"" + user.id + "\">" +
-          '<option value="reader"' + (user.role === "reader" ? " selected" : "") + ">reader</option>" +
-          '<option value="author"' + (user.role === "author" ? " selected" : "") + ">author</option>" +
-          '<option value="editor"' + (user.role === "editor" ? " selected" : "") + ">editor</option>" +
-          '<option value="admin"' + (user.role === "admin" ? " selected" : "") + ">admin</option>" +
+          "<td>" +
+          user.id +
+          "</td>" +
+          "<td>" +
+          escapeHtml(user.username) +
+          "</td>" +
+          "<td>" +
+          escapeHtml(user.email) +
+          "</td>" +
+          '<td><select class="form__select" data-user-role="' +
+          user.id +
+          '">' +
+          '<option value="reader"' +
+          (user.role === "reader" ? " selected" : "") +
+          ">reader</option>" +
+          '<option value="author"' +
+          (user.role === "author" ? " selected" : "") +
+          ">author</option>" +
+          '<option value="editor"' +
+          (user.role === "editor" ? " selected" : "") +
+          ">editor</option>" +
+          '<option value="admin"' +
+          (user.role === "admin" ? " selected" : "") +
+          ">admin</option>" +
           "</select></td>" +
-          '<td><input type="checkbox" data-user-active="' + user.id + '"' + (user.is_active ? " checked" : "") + " /></td>" +
-          '<td class="backoffice-page__row-actions"><button class="btn btn--secondary btn--sm" type="button" data-action="save-user" data-id="' + user.id + '">Sauver</button><button class="btn btn--danger btn--sm" type="button" data-action="delete-user" data-id="' + user.id + '">Supprimer</button></td>' +
+          '<td><input type="checkbox" data-user-active="' +
+          user.id +
+          '"' +
+          (user.is_active ? " checked" : "") +
+          " /></td>" +
+          '<td class="backoffice-page__row-actions"><button class="btn btn--secondary btn--sm" type="button" data-action="save-user" data-id="' +
+          user.id +
+          '">Sauver</button><button class="btn btn--danger btn--sm" type="button" data-action="delete-user" data-id="' +
+          user.id +
+          '">Supprimer</button></td>' +
           "</tr>"
         );
       })
       .join("");
 
-    setAlert(adminStatus, "success", users.length + " utilisateur(s) charge(s).");
+    setAlert(
+      adminStatus,
+      "success",
+      users.length + " utilisateur(s) charge(s).",
+    );
   }
 
   async function loadUsers() {
     if (!isAdmin()) {
       return;
     }
-    const payload = await api("/admin/users?page=1&limit=50", { method: "GET" });
+    const payload = await api("/admin/users?page=1&limit=50", {
+      method: "GET",
+    });
     renderUsers(payload.data || []);
   }
 
@@ -464,10 +717,15 @@
       ]);
 
       if (adminUsersCount) {
-        adminUsersCount.textContent = String((usersPayload.pagination && usersPayload.pagination.total) || 0);
+        adminUsersCount.textContent = String(
+          (usersPayload.pagination && usersPayload.pagination.total) || 0,
+        );
       }
       if (adminDocumentsCount) {
-        adminDocumentsCount.textContent = String((documentsPayload.pagination && documentsPayload.pagination.total) || 0);
+        adminDocumentsCount.textContent = String(
+          (documentsPayload.pagination && documentsPayload.pagination.total) ||
+            0,
+        );
       }
     } catch (error) {
       if (adminUsersCount) {
@@ -484,12 +742,26 @@
       .map(function (tag) {
         return (
           "<tr>" +
-          "<td>" + tag.id + "</td>" +
-          '<td><input class="form__input" data-tag-name="' + tag.id + '" value="' + escapeHtml(tag.name || "") + '" /></td>' +
-          '<td><input class="form__input" data-tag-slug="' + tag.id + '" value="' + escapeHtml(tag.slug || "") + '" /></td>' +
+          "<td>" +
+          tag.id +
+          "</td>" +
+          '<td><input class="form__input" data-tag-name="' +
+          tag.id +
+          '" value="' +
+          escapeHtml(tag.name || "") +
+          '" /></td>' +
+          '<td><input class="form__input" data-tag-slug="' +
+          tag.id +
+          '" value="' +
+          escapeHtml(tag.slug || "") +
+          '" /></td>' +
           '<td class="backoffice-page__row-actions">' +
-          '<button class="btn btn--secondary btn--sm" type="button" data-action="save-tag" data-id="' + tag.id + '">Sauver</button> ' +
-          '<button class="btn btn--danger btn--sm" type="button" data-action="delete-tag" data-id="' + tag.id + '">Supprimer</button>' +
+          '<button class="btn btn--secondary btn--sm" type="button" data-action="save-tag" data-id="' +
+          tag.id +
+          '">Sauver</button> ' +
+          '<button class="btn btn--danger btn--sm" type="button" data-action="delete-tag" data-id="' +
+          tag.id +
+          '">Supprimer</button>' +
           "</td>" +
           "</tr>"
         );
@@ -501,7 +773,9 @@
     if (!isAdmin()) {
       return;
     }
-    const payload = await api("/admin/tags?page=1&limit=100", { method: "GET" });
+    const payload = await api("/admin/tags?page=1&limit=100", {
+      method: "GET",
+    });
     knownTags = payload.data || [];
     renderTags(knownTags);
     renderTaxonomySelectors();
@@ -512,13 +786,31 @@
       .map(function (section) {
         return (
           "<tr>" +
-          "<td>" + section.id + "</td>" +
-          '<td><input class="form__input" data-section-name="' + section.id + '" value="' + escapeHtml(section.name || "") + '" /></td>' +
-          '<td><input class="form__input" data-section-slug="' + section.id + '" value="' + escapeHtml(section.slug || "") + '" /></td>' +
-          '<td><input class="form__input" type="number" min="1" data-section-parent="' + section.id + '" value="' + (section.parent_id || "") + '" /></td>' +
+          "<td>" +
+          section.id +
+          "</td>" +
+          '<td><input class="form__input" data-section-name="' +
+          section.id +
+          '" value="' +
+          escapeHtml(section.name || "") +
+          '" /></td>' +
+          '<td><input class="form__input" data-section-slug="' +
+          section.id +
+          '" value="' +
+          escapeHtml(section.slug || "") +
+          '" /></td>' +
+          '<td><input class="form__input" type="number" min="1" data-section-parent="' +
+          section.id +
+          '" value="' +
+          (section.parent_id || "") +
+          '" /></td>' +
           '<td class="backoffice-page__row-actions">' +
-          '<button class="btn btn--secondary btn--sm" type="button" data-action="save-section" data-id="' + section.id + '">Sauver</button> ' +
-          '<button class="btn btn--danger btn--sm" type="button" data-action="delete-section" data-id="' + section.id + '">Supprimer</button>' +
+          '<button class="btn btn--secondary btn--sm" type="button" data-action="save-section" data-id="' +
+          section.id +
+          '">Sauver</button> ' +
+          '<button class="btn btn--danger btn--sm" type="button" data-action="delete-section" data-id="' +
+          section.id +
+          '">Supprimer</button>' +
           "</td>" +
           "</tr>"
         );
@@ -530,7 +822,9 @@
     if (!isAdmin()) {
       return;
     }
-    const payload = await api("/admin/sections?page=1&limit=100", { method: "GET" });
+    const payload = await api("/admin/sections?page=1&limit=100", {
+      method: "GET",
+    });
     knownSections = payload.data || [];
     renderSections(knownSections);
     renderTaxonomySelectors();
@@ -541,11 +835,23 @@
       .map(function (log) {
         return (
           "<tr>" +
-          "<td>" + log.id + "</td>" +
-          "<td>" + escapeHtml(log.action || "-") + "</td>" +
-          "<td>" + escapeHtml(log.entity_type || "-") + " #" + escapeHtml(log.entity_id || "-") + "</td>" +
-          "<td>" + escapeHtml(log.user_id || "-") + "</td>" +
-          "<td>" + escapeHtml(log.created_at || "-") + "</td>" +
+          "<td>" +
+          log.id +
+          "</td>" +
+          "<td>" +
+          escapeHtml(log.action || "-") +
+          "</td>" +
+          "<td>" +
+          escapeHtml(log.entity_type || "-") +
+          " #" +
+          escapeHtml(log.entity_id || "-") +
+          "</td>" +
+          "<td>" +
+          escapeHtml(log.user_id || "-") +
+          "</td>" +
+          "<td>" +
+          escapeHtml(log.created_at || "-") +
+          "</td>" +
           "</tr>"
         );
       })
@@ -556,7 +862,9 @@
     if (!isAdmin()) {
       return;
     }
-    const payload = await api("/admin/audit-logs?page=1&limit=50", { method: "GET" });
+    const payload = await api("/admin/audit-logs?page=1&limit=50", {
+      method: "GET",
+    });
     renderLogs(payload.data || []);
   }
 
@@ -578,10 +886,14 @@
 
       updateNavigation();
       renderDashboard();
-      documentEditor.hidden = !canEditDocuments();
+      documentEditor.hidden = !canUseDocumentEditor();
       setAlert(authStatus, "success", "Connecte.");
 
-      if (!window.location.hash || window.location.hash === "#/login" || window.location.hash === "#/register") {
+      if (
+        !window.location.hash ||
+        window.location.hash === "#/login" ||
+        window.location.hash === "#/register"
+      ) {
         setRoute("#/dashboard");
       }
 
@@ -639,14 +951,26 @@
       setAlert(registerStatus, "info", "Inscription en cours...");
       await api("/auth/register", {
         method: "POST",
-        body: JSON.stringify({ username: username, email: email, password: password }),
+        body: JSON.stringify({
+          username: username,
+          email: email,
+          password: password,
+        }),
       });
 
       registerForm.reset();
-      setAlert(registerStatus, "success", "Inscription reussie, connecte-toi maintenant.");
+      setAlert(
+        registerStatus,
+        "success",
+        "Inscription reussie, connecte-toi maintenant.",
+      );
       setRoute("#/login");
     } catch (error) {
-      setAlert(registerStatus, "danger", "Inscription echouee: " + error.message);
+      setAlert(
+        registerStatus,
+        "danger",
+        "Inscription echouee: " + error.message,
+      );
     }
   });
 
@@ -695,7 +1019,11 @@
         setAlert(documentsStatus, "success", "Document supprime.");
         loadDocuments();
       } catch (error) {
-        setAlert(documentsStatus, "danger", "Suppression impossible: " + error.message);
+        setAlert(
+          documentsStatus,
+          "danger",
+          "Suppression impossible: " + error.message,
+        );
       }
     }
   });
@@ -707,17 +1035,14 @@
   documentForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    if (!canEditDocuments()) {
-      setAlert(documentFormStatus, "warning", "Acces reserve aux editeurs/admins.");
-      return;
-    }
-
     const payload = {
       title: documentTitleInput.value.trim(),
       slug: documentSlugInput.value.trim() || undefined,
       content: documentContentInput.value,
       status: documentStatusInput.value,
-      section_id: documentSectionInput.value ? Number(documentSectionInput.value) : null,
+      section_id: documentSectionInput.value
+        ? Number(documentSectionInput.value)
+        : null,
       tags: parseTags(documentTagsInput.value),
       meta_title: documentMetaTitleInput.value.trim() || null,
       meta_description: documentMetaDescriptionInput.value.trim() || null,
@@ -728,28 +1053,42 @@
       return;
     }
 
-    const documentId = documentIdInput.value ? Number(documentIdInput.value) : null;
+    const documentId = documentIdInput.value
+      ? Number(documentIdInput.value)
+      : null;
+
+    if (!documentId && !canCreateDocuments()) {
+      setAlert(
+        documentFormStatus,
+        "warning",
+        "Creation reservee aux editeurs/admins.",
+      );
+      return;
+    }
+
+    if (!documentId && !canUseDocumentEditor()) {
+      setAlert(
+        documentFormStatus,
+        "warning",
+        "Tu n'as pas les droits pour modifier un document.",
+      );
+      return;
+    }
 
     try {
       setAlert(documentFormStatus, "info", "Enregistrement en cours...");
 
-      if (documentId) {
-        await api("/documents/" + documentId, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
-      } else {
-        await api("/documents", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-      }
+      await saveDocument(payload, documentId);
 
       setAlert(documentFormStatus, "success", "Document enregistre.");
       resetDocumentForm();
       loadDocuments();
     } catch (error) {
-      setAlert(documentFormStatus, "danger", "Enregistrement impossible: " + error.message);
+      setAlert(
+        documentFormStatus,
+        "danger",
+        "Enregistrement impossible: " + error.message,
+      );
     }
   });
 
@@ -758,7 +1097,11 @@
       setAlert(adminStatus, "info", "Chargement des utilisateurs...");
       await loadUsers();
     } catch (error) {
-      setAlert(adminStatus, "danger", "Impossible de charger: " + error.message);
+      setAlert(
+        adminStatus,
+        "danger",
+        "Impossible de charger: " + error.message,
+      );
     }
   });
 
@@ -772,8 +1115,12 @@
     const userId = Number(button.getAttribute("data-id"));
 
     if (action === "save-user") {
-      const roleInput = usersBody.querySelector('[data-user-role="' + userId + '"]');
-      const activeInput = usersBody.querySelector('[data-user-active="' + userId + '"]');
+      const roleInput = usersBody.querySelector(
+        '[data-user-role="' + userId + '"]',
+      );
+      const activeInput = usersBody.querySelector(
+        '[data-user-active="' + userId + '"]',
+      );
 
       try {
         await api("/admin/users/" + userId, {
@@ -783,11 +1130,19 @@
             is_active: !!(activeInput && activeInput.checked),
           }),
         });
-        setAlert(adminStatus, "success", "Utilisateur #" + userId + " mis a jour.");
+        setAlert(
+          adminStatus,
+          "success",
+          "Utilisateur #" + userId + " mis a jour.",
+        );
         await loadUsers();
         await loadAdminStats();
       } catch (error) {
-        setAlert(adminStatus, "danger", "Mise a jour utilisateur impossible: " + error.message);
+        setAlert(
+          adminStatus,
+          "danger",
+          "Mise a jour utilisateur impossible: " + error.message,
+        );
       }
       return;
     }
@@ -801,11 +1156,19 @@
         await api("/admin/users/" + userId, {
           method: "DELETE",
         });
-        setAlert(adminStatus, "success", "Utilisateur #" + userId + " supprime.");
+        setAlert(
+          adminStatus,
+          "success",
+          "Utilisateur #" + userId + " supprime.",
+        );
         await loadUsers();
         await loadAdminStats();
       } catch (error) {
-        setAlert(adminStatus, "danger", "Suppression utilisateur impossible: " + error.message);
+        setAlert(
+          adminStatus,
+          "danger",
+          "Suppression utilisateur impossible: " + error.message,
+        );
       }
     }
   });
@@ -816,7 +1179,11 @@
       await loadTags();
       setAlert(adminStatus, "success", "Tags charges.");
     } catch (error) {
-      setAlert(adminStatus, "danger", "Impossible de charger les tags: " + error.message);
+      setAlert(
+        adminStatus,
+        "danger",
+        "Impossible de charger les tags: " + error.message,
+      );
     }
   });
 
@@ -840,7 +1207,11 @@
       setAlert(adminStatus, "success", "Tag cree.");
       loadTags();
     } catch (error) {
-      setAlert(adminStatus, "danger", "Creation tag impossible: " + error.message);
+      setAlert(
+        adminStatus,
+        "danger",
+        "Creation tag impossible: " + error.message,
+      );
     }
   });
 
@@ -867,7 +1238,11 @@
         setAlert(adminStatus, "success", "Tag #" + id + " mis a jour.");
         loadTags();
       } catch (error) {
-        setAlert(adminStatus, "danger", "Mise a jour tag impossible: " + error.message);
+        setAlert(
+          adminStatus,
+          "danger",
+          "Mise a jour tag impossible: " + error.message,
+        );
       }
       return;
     }
@@ -881,7 +1256,11 @@
         setAlert(adminStatus, "success", "Tag supprime.");
         loadTags();
       } catch (error) {
-        setAlert(adminStatus, "danger", "Suppression tag impossible: " + error.message);
+        setAlert(
+          adminStatus,
+          "danger",
+          "Suppression tag impossible: " + error.message,
+        );
       }
     }
   });
@@ -892,7 +1271,11 @@
       await loadSections();
       setAlert(adminStatus, "success", "Sections chargees.");
     } catch (error) {
-      setAlert(adminStatus, "danger", "Impossible de charger les sections: " + error.message);
+      setAlert(
+        adminStatus,
+        "danger",
+        "Impossible de charger les sections: " + error.message,
+      );
     }
   });
 
@@ -901,7 +1284,9 @@
 
     const name = document.getElementById("section-create-name").value.trim();
     const slug = document.getElementById("section-create-slug").value.trim();
-    const parent = document.getElementById("section-create-parent").value.trim();
+    const parent = document
+      .getElementById("section-create-parent")
+      .value.trim();
 
     if (!name) {
       setAlert(adminStatus, "warning", "Le nom de section est obligatoire.");
@@ -921,7 +1306,11 @@
       setAlert(adminStatus, "success", "Section creee.");
       loadSections();
     } catch (error) {
-      setAlert(adminStatus, "danger", "Creation section impossible: " + error.message);
+      setAlert(
+        adminStatus,
+        "danger",
+        "Creation section impossible: " + error.message,
+      );
     }
   });
 
@@ -935,22 +1324,35 @@
     const id = Number(button.getAttribute("data-id"));
 
     if (action === "save-section") {
-      const nameInput = sectionsBody.querySelector('[data-section-name="' + id + '"]');
-      const slugInput = sectionsBody.querySelector('[data-section-slug="' + id + '"]');
-      const parentInput = sectionsBody.querySelector('[data-section-parent="' + id + '"]');
+      const nameInput = sectionsBody.querySelector(
+        '[data-section-name="' + id + '"]',
+      );
+      const slugInput = sectionsBody.querySelector(
+        '[data-section-slug="' + id + '"]',
+      );
+      const parentInput = sectionsBody.querySelector(
+        '[data-section-parent="' + id + '"]',
+      );
       try {
         await api("/admin/sections/" + id, {
           method: "PATCH",
           body: JSON.stringify({
             name: nameInput ? nameInput.value.trim() : "",
             slug: slugInput ? slugInput.value.trim() : "",
-            parent_id: parentInput && parentInput.value ? Number(parentInput.value) : null,
+            parent_id:
+              parentInput && parentInput.value
+                ? Number(parentInput.value)
+                : null,
           }),
         });
         setAlert(adminStatus, "success", "Section #" + id + " mise a jour.");
         loadSections();
       } catch (error) {
-        setAlert(adminStatus, "danger", "Mise a jour section impossible: " + error.message);
+        setAlert(
+          adminStatus,
+          "danger",
+          "Mise a jour section impossible: " + error.message,
+        );
       }
       return;
     }
@@ -964,7 +1366,11 @@
         setAlert(adminStatus, "success", "Section supprimee.");
         loadSections();
       } catch (error) {
-        setAlert(adminStatus, "danger", "Suppression section impossible: " + error.message);
+        setAlert(
+          adminStatus,
+          "danger",
+          "Suppression section impossible: " + error.message,
+        );
       }
     }
   });
@@ -975,8 +1381,65 @@
       await loadLogs();
       setAlert(adminStatus, "success", "Logs charges.");
     } catch (error) {
-      setAlert(adminStatus, "danger", "Impossible de charger les logs: " + error.message);
+      setAlert(
+        adminStatus,
+        "danger",
+        "Impossible de charger les logs: " + error.message,
+      );
     }
+  });
+
+  dashboardQuickCreateForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    if (!canCreateDocuments()) {
+      setAlert(
+        dashboardQuickCreateStatus,
+        "warning",
+        "Creation reservee aux editeurs/admins.",
+      );
+      return;
+    }
+
+    const payload = {
+      title: quickDocumentTitle.value.trim(),
+      slug: quickDocumentSlug.value.trim() || undefined,
+      content: quickDocumentContent.value,
+      status: quickDocumentStatus.value,
+      tags: parseTags(quickDocumentTags.value),
+    };
+
+    if (!payload.title) {
+      setAlert(
+        dashboardQuickCreateStatus,
+        "warning",
+        "Le titre est obligatoire.",
+      );
+      return;
+    }
+
+    try {
+      setAlert(dashboardQuickCreateStatus, "info", "Creation en cours...");
+      await saveDocument(payload, null);
+      dashboardQuickCreateForm.reset();
+      quickDocumentStatus.value = "draft";
+      setAlert(
+        dashboardQuickCreateStatus,
+        "success",
+        "Document cree. Tu peux le retrouver dans l'onglet Documents.",
+      );
+      loadDocuments();
+    } catch (error) {
+      setAlert(
+        dashboardQuickCreateStatus,
+        "danger",
+        "Creation impossible: " + error.message,
+      );
+    }
+  });
+
+  dashboardOpenDocuments.addEventListener("click", function () {
+    setRoute("#/documents");
   });
 
   logoutBtn.addEventListener("click", async function () {
@@ -1000,9 +1463,20 @@
     currentUserBadge.textContent = "Non connecte";
 
     setAlert(authStatus, "info", "Deconnecte.");
-    setAlert(registerStatus, "info", "Remplis le formulaire pour creer ton compte.");
+    setAlert(
+      registerStatus,
+      "info",
+      "Remplis le formulaire pour creer ton compte.",
+    );
     setAlert(documentsStatus, "info", "Charge les documents.");
     setAlert(adminStatus, "info", "Zone admin.");
+    if (dashboardQuickCreateStatus) {
+      setAlert(
+        dashboardQuickCreateStatus,
+        "info",
+        "Formulaire de creation rapide.",
+      );
+    }
 
     setRoute("#/login");
   });
