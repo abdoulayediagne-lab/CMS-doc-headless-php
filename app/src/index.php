@@ -2,6 +2,7 @@
 
 use App\Lib\Http\Request;
 use App\Lib\Http\Router;
+use App\Lib\Security\CsrfGuard;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -21,6 +22,17 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
     http_response_code(204);
+    exit();
+}
+
+$csrfGuard = new CsrfGuard($allowedOrigins);
+$csrfError = $csrfGuard->validate($_SERVER);
+if ($csrfError !== null) {
+    header('Content-Type: application/json');
+    http_response_code((int) ($csrfError['status'] ?? 403));
+    echo json_encode([
+        'error' => (string) ($csrfError['error'] ?? 'forbidden'),
+    ]);
     exit();
 }
 
