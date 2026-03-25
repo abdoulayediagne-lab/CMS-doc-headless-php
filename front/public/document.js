@@ -34,7 +34,7 @@
 
     const published = doc.published_at ? new Date(doc.published_at).toLocaleString("fr-FR") : "-";
     const updated = doc.updated_at ? new Date(doc.updated_at).toLocaleString("fr-FR") : "-";
-    metaEl.textContent = "Slug: " + (doc.slug || "-") + " | Publie: " + published + " | Mise a jour: " + updated;
+    metaEl.textContent = "Slug: " + (doc.slug || "-") + " | Publié: " + published + " | Mise à jour: " + updated;
 
     tagsEl.innerHTML = Array.isArray(doc.tags)
       ? doc.tags
@@ -47,7 +47,7 @@
     const safeText = escapeHtml(doc.content || "").replace(/\n/g, "<br>");
     contentEl.innerHTML = safeText || "<p class=\"text-muted\">Contenu vide.</p>";
 
-    setAlert("Document charge avec succes.", "success");
+    setAlert("Document chargé avec succès.", "success");
     document.title = (doc.title || "Document") + " - CMS Documentation";
   }
 

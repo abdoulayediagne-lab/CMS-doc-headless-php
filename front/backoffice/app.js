@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const API_BASE = window.API_BASE_URL || "http://localhost:8080";
   const PUBLIC_FRONT_URL = window.PUBLIC_FRONT_URL || "http://localhost:5173";
   const TOKEN_KEY = "cms_access_token";
@@ -326,7 +326,7 @@
   function renderDashboard() {
     if (!currentUser) {
       dashboardIntro.textContent = "Connecte-toi pour charger ton espace.";
-      setAlert(dashboardAlert, "info", "Selectionne une vue via le menu.");
+      setAlert(dashboardAlert, "info", "Sélectionne une vue via le menu.");
       dashboardAdmin.hidden = true;
       dashboardRolePanel.hidden = true;
       return;
@@ -360,13 +360,13 @@
       setAlert(adminStatus, "info", "Gestion admin active.");
       dashboardRoleTitle.textContent = "Actions rapides";
       dashboardRoleDescription.textContent =
-        "Tu peux creer, modifier et supprimer n'importe quel document.\nTu geres aussi toute la configuration du backoffice.";
+        "Tu peux créer, modifier et supprimer n'importe quel document.\nTu geres aussi toute la configuration du backoffice.";
       dashboardQuickCreateForm.hidden = false;
       dashboardQuickCreateStatus.hidden = false;
       setAlert(
         dashboardQuickCreateStatus,
         "info",
-        "Formulaire rapide actif pour creer un document.",
+        "Formulaire rapide actif pour créer un document.",
       );
       loadAdminStats();
     } else if (currentUser.role === "editor") {
@@ -374,17 +374,17 @@
       setAlert(
         dashboardAlert,
         "info",
-        "Editeur: creation, modification et suppression de tous les documents.",
+        "Éditeur: creation, modification et suppression de tous les documents.",
       );
       dashboardRoleTitle.textContent = "Creation rapide";
       dashboardRoleDescription.textContent =
-        "Tu peux creer, modifier et supprimer n'importe quel document.\nTu n'as pas acces a l'administration utilisateurs/tags/sections/logs.";
+        "Tu peux créer, modifier et supprimer n'importe quel document.\nTu n'as pas accès a l'administration utilisateurs/tags/sections/logs.";
       dashboardQuickCreateForm.hidden = false;
       dashboardQuickCreateStatus.hidden = false;
       setAlert(
         dashboardQuickCreateStatus,
         "info",
-        "Tu peux creer, modifier et supprimer n'importe quel document.",
+        "Tu peux créer, modifier et supprimer n'importe quel document.",
       );
     } else if (currentUser.role === "author") {
       dashboardAdmin.hidden = true;
@@ -395,20 +395,20 @@
       );
       dashboardRoleTitle.textContent = "Navigation auteur";
       dashboardRoleDescription.textContent =
-        "Tu peux creer des documents.\nTu peux modifier et supprimer uniquement les documents dont tu es l'auteur.";
+        "Tu peux créer des documents.\nTu peux modifier et supprimer uniquement les documents dont tu es l'auteur.";
       dashboardQuickCreateForm.hidden = false;
       dashboardQuickCreateStatus.hidden = false;
       setAlert(
         dashboardQuickCreateStatus,
         "info",
-        "Tu peux creer des documents et gerer uniquement ceux que tu as crees.",
+        "Tu peux créer des documents et gerer uniquement ceux que tu as crees.",
       );
     } else {
       dashboardAdmin.hidden = true;
-      setAlert(dashboardAlert, "info", "Lecteur: acces en lecture uniquement.");
+      setAlert(dashboardAlert, "info", "Lecteur: accès en lecture uniquement.");
       dashboardRoleTitle.textContent = "Acces lecture";
       dashboardRoleDescription.textContent =
-        "Tu ne peux ni creer, ni modifier, ni supprimer de document.\nTu peux consulter les documents publies via la vitrine publique.";
+        "Tu ne peux ni créer, ni modifier, ni supprimer de document.\nTu peux consulter les documents publies via la vitrine publique.";
       dashboardOpenDocuments.hidden = true;
       dashboardOpenPublic.hidden = false;
     }
@@ -583,7 +583,7 @@
     setAlert(
       documentsStatus,
       "success",
-      items.length + " document(s) charge(s).",
+      items.length + " document(s) chargé(s).",
     );
   }
 
@@ -606,7 +606,7 @@
       setAlert(
         documentsStatus,
         "danger",
-        "Impossible de charger le detail: " + error.message,
+        "Impossible de charger le détail: " + error.message,
       );
     }
   }
@@ -650,7 +650,7 @@
       setAlert(
         documentFormStatus,
         "info",
-        "Document charge dans le formulaire.",
+        "Document chargé dans le formulaire.",
       );
       documentEditor.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (error) {
@@ -752,7 +752,7 @@
     setAlert(
       adminStatus,
       "success",
-      users.length + " utilisateur(s) charge(s).",
+      users.length + " utilisateur(s) chargé(s).",
     );
   }
 
@@ -1004,8 +1004,8 @@
       currentUser = null;
       updateNavigation();
       renderDashboard();
-      currentUserBadge.textContent = "Non connecte";
-      setAlert(authStatus, "info", "Non connecte.");
+      currentUserBadge.textContent = "Non connecté";
+      setAlert(authStatus, "info", "Non connecté.");
       return;
     }
 
@@ -1016,7 +1016,7 @@
       updateNavigation();
       renderDashboard();
       documentEditor.hidden = !canUseDocumentEditor();
-      setAlert(authStatus, "success", "Connecte.");
+      setAlert(authStatus, "success", "Connecté.");
 
       if (
         !window.location.hash ||
@@ -1032,7 +1032,7 @@
       currentUser = null;
       updateNavigation();
       renderDashboard();
-      currentUserBadge.textContent = "Non connecte";
+      currentUserBadge.textContent = "Non connecté";
       setAlert(authStatus, "danger", "Session invalide: " + error.message);
       setRoute("#/login");
     }
@@ -1060,7 +1060,7 @@
       await refreshSession();
       setRoute("#/dashboard");
     } catch (error) {
-      setAlert(authStatus, "danger", "Connexion echouee: " + error.message);
+      setAlert(authStatus, "danger", "Connexion échouée: " + error.message);
     }
   });
 
@@ -1091,14 +1091,14 @@
       setAlert(
         registerStatus,
         "success",
-        "Inscription reussie, connecte-toi maintenant.",
+        "Inscription réussie, connecte-toi maintenant.",
       );
       setRoute("#/login");
     } catch (error) {
       setAlert(
         registerStatus,
         "danger",
-        "Inscription echouee: " + error.message,
+        "Inscription échouée: " + error.message,
       );
     }
   });
@@ -1277,7 +1277,7 @@
         setAlert(
           adminStatus,
           "danger",
-          "Mise a jour utilisateur impossible: " + error.message,
+          "Mise à jour utilisateur impossible: " + error.message,
         );
       }
       return;
@@ -1313,7 +1313,7 @@
     try {
       setAlert(adminStatus, "info", "Chargement des tags...");
       await loadTags();
-      setAlert(adminStatus, "success", "Tags charges.");
+      setAlert(adminStatus, "success", "Tags chargés.");
     } catch (error) {
       setAlert(
         adminStatus,
@@ -1340,7 +1340,7 @@
         body: JSON.stringify({ name: name, slug: slug || undefined }),
       });
       tagCreateForm.reset();
-      setAlert(adminStatus, "success", "Tag cree.");
+      setAlert(adminStatus, "success", "Tag créé.");
       loadTags();
     } catch (error) {
       setAlert(
@@ -1377,7 +1377,7 @@
         setAlert(
           adminStatus,
           "danger",
-          "Mise a jour tag impossible: " + error.message,
+          "Mise à jour tag impossible: " + error.message,
         );
       }
       return;
@@ -1405,7 +1405,7 @@
     try {
       setAlert(adminStatus, "info", "Chargement des sections...");
       await loadSections();
-      setAlert(adminStatus, "success", "Sections chargees.");
+      setAlert(adminStatus, "success", "Sections chargées.");
     } catch (error) {
       setAlert(
         adminStatus,
@@ -1439,7 +1439,7 @@
         }),
       });
       sectionCreateForm.reset();
-      setAlert(adminStatus, "success", "Section creee.");
+      setAlert(adminStatus, "success", "Section créée.");
       loadSections();
     } catch (error) {
       setAlert(
@@ -1487,7 +1487,7 @@
         setAlert(
           adminStatus,
           "danger",
-          "Mise a jour section impossible: " + error.message,
+          "Mise à jour section impossible: " + error.message,
         );
       }
       return;
@@ -1515,7 +1515,7 @@
     try {
       setAlert(adminStatus, "info", "Chargement des logs...");
       await loadLogs();
-      setAlert(adminStatus, "success", "Logs charges.");
+      setAlert(adminStatus, "success", "Logs chargés.");
     } catch (error) {
       setAlert(
         adminStatus,
@@ -1527,14 +1527,14 @@
 
   loadMediaBtn.addEventListener("click", async function () {
     try {
-      setAlert(adminStatus, "info", "Chargement des medias...");
+      setAlert(adminStatus, "info", "Chargement des médias...");
       await loadMedia();
-      setAlert(adminStatus, "success", "Medias charges.");
+      setAlert(adminStatus, "success", "Médias chargés.");
     } catch (error) {
       setAlert(
         adminStatus,
         "danger",
-        "Impossible de charger les medias: " + error.message,
+        "Impossible de charger les médias: " + error.message,
       );
     }
   });
@@ -1644,7 +1644,7 @@
         setAlert(
           adminStatus,
           "danger",
-          "Mise a jour media impossible: " + error.message,
+          "Mise à jour media impossible: " + error.message,
         );
       }
       return;
@@ -1706,7 +1706,7 @@
       setAlert(
         dashboardQuickCreateStatus,
         "success",
-        "Document cree. Tu peux le retrouver dans l'onglet Documents.",
+        "Document créé. Tu peux le retrouver dans l'onglet Documents.",
       );
       loadDocuments();
     } catch (error) {
@@ -1741,13 +1741,13 @@
     logsBody.innerHTML = "";
     mediaBody.innerHTML = "";
     documentsBody.innerHTML = "";
-    currentUserBadge.textContent = "Non connecte";
+    currentUserBadge.textContent = "Non connecté";
 
-    setAlert(authStatus, "info", "Deconnecte.");
+    setAlert(authStatus, "info", "Déconnecté.");
     setAlert(
       registerStatus,
       "info",
-      "Remplis le formulaire pour creer ton compte.",
+      "Remplis le formulaire pour créer ton compte.",
     );
     setAlert(documentsStatus, "info", "Charge les documents.");
     setAlert(adminStatus, "info", "Zone admin.");
