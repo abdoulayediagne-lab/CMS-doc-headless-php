@@ -473,6 +473,65 @@
                 </table>
               </div>
             </section>
+
+            <section class="backoffice-page__subpanel">
+              <div class="backoffice-page__header-row mb-md">
+                <h3 class="m-0">Mediatheque</h3>
+                <button
+                  id="load-media-btn"
+                  class="btn btn--secondary"
+                  type="button"
+                >
+                  Charger
+                </button>
+              </div>
+              <form
+                id="media-upload-form"
+                class="form backoffice-page__inline-form"
+                enctype="multipart/form-data"
+                novalidate
+              >
+                <input
+                  id="media-upload-file"
+                  class="form__input"
+                  type="file"
+                  required
+                />
+                <input
+                  id="media-upload-alt"
+                  class="form__input"
+                  type="text"
+                  placeholder="Alt text (optionnel)"
+                />
+                <input
+                  id="media-upload-document"
+                  class="form__input"
+                  type="number"
+                  min="1"
+                  placeholder="Document ID (optionnel)"
+                />
+                <button class="btn btn--primary" type="submit">
+                  Uploader
+                </button>
+              </form>
+              <div class="table-wrapper">
+                <table class="table" aria-label="Liste des medias">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Fichier</th>
+                      <th>Alt text</th>
+                      <th>Document</th>
+                      <th>Type</th>
+                      <th>Taille</th>
+                      <th>Lien</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="media-body"></tbody>
+                </table>
+              </div>
+            </section>
           </section>
         </div>
       </section>

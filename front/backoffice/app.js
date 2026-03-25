@@ -15,6 +15,7 @@
   const documentForm = document.getElementById("document-form");
   const tagCreateForm = document.getElementById("tag-create-form");
   const sectionCreateForm = document.getElementById("section-create-form");
+  const mediaUploadForm = document.getElementById("media-upload-form");
 
   const authStatus = document.getElementById("auth-status");
   const registerStatus = document.getElementById("register-status");
@@ -55,6 +56,7 @@
   const tagsBody = document.getElementById("tags-body");
   const sectionsBody = document.getElementById("sections-body");
   const logsBody = document.getElementById("logs-body");
+  const mediaBody = document.getElementById("media-body");
   const documentsBody = document.getElementById("documents-body");
 
   const docSearchInput = document.getElementById("doc-search");
@@ -67,7 +69,12 @@
   const loadTagsBtn = document.getElementById("load-tags-btn");
   const loadSectionsBtn = document.getElementById("load-sections-btn");
   const loadLogsBtn = document.getElementById("load-logs-btn");
+  const loadMediaBtn = document.getElementById("load-media-btn");
   const logoutBtn = document.getElementById("logout-btn");
+
+  const mediaUploadFile = document.getElementById("media-upload-file");
+  const mediaUploadAlt = document.getElementById("media-upload-alt");
+  const mediaUploadDocument = document.getElementById("media-upload-document");
 
   const navLogin = document.getElementById("nav-login");
   const navRegister = document.getElementById("nav-register");
@@ -192,17 +199,22 @@
 
   async function api(path, options) {
     const token = getToken();
-    const headers = Object.assign(
-      { "Content-Type": "application/json" },
-      (options && options.headers) || {},
-    );
+    const requestOptions = options || {};
+    const hasFormDataBody =
+      typeof FormData !== "undefined" && requestOptions.body instanceof FormData;
+    const headers = Object.assign({}, requestOptions.headers || {});
+
+    if (!hasFormDataBody && !headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
+
     if (token) {
       headers.Authorization = "Bearer " + token;
     }
 
     const response = await fetch(
       API_BASE + path,
-      Object.assign({}, options, { headers }),
+      Object.assign({}, requestOptions, { headers }),
     );
     const text = await response.text();
     let payload = {};
@@ -264,6 +276,7 @@
         loadUsers();
         loadTags();
         loadSections();
+        loadMedia();
       }
       return;
     }
@@ -884,6 +897,61 @@
     renderLogs(payload.data || []);
   }
 
+  function renderMedia(items) {
+    mediaBody.innerHTML = (items || [])
+      .map(function (media) {
+        const publicUrl = API_BASE + (media.path || "");
+        return (
+          "<tr>" +
+          "<td>" +
+          media.id +
+          "</td>" +
+          "<td>" +
+          escapeHtml(media.filename || "-") +
+          "</td>" +
+          '<td><input class="form__input" data-media-alt="' +
+          media.id +
+          '" value="' +
+          escapeHtml(media.alt_text || "") +
+          '" placeholder="alt text" /></td>' +
+          '<td><input class="form__input" type="number" min="1" data-media-document="' +
+          media.id +
+          '" value="' +
+          (media.document_id || "") +
+          '" placeholder="ID" /></td>' +
+          "<td>" +
+          escapeHtml(media.mime_type || "-") +
+          "</td>" +
+          "<td>" +
+          escapeHtml(String(media.file_size || 0)) +
+          "</td>" +
+          '<td><a class="btn btn--outline btn--sm" href="' +
+          escapeHtml(publicUrl) +
+          '" target="_blank" rel="noopener noreferrer">Ouvrir</a></td>' +
+          '<td class="backoffice-page__row-actions">' +
+          '<button class="btn btn--secondary btn--sm" type="button" data-action="save-media" data-id="' +
+          media.id +
+          '">Sauver</button> ' +
+          '<button class="btn btn--danger btn--sm" type="button" data-action="delete-media" data-id="' +
+          media.id +
+          '">Supprimer</button>' +
+          "</td>" +
+          "</tr>"
+        );
+      })
+      .join("");
+  }
+
+  async function loadMedia() {
+    if (!isAdmin()) {
+      return;
+    }
+    const payload = await api("/admin/media?page=1&limit=50", {
+      method: "GET",
+    });
+    renderMedia(payload.data || []);
+  }
+
   async function refreshSession() {
     const token = getToken();
 
@@ -1412,6 +1480,122 @@
     }
   });
 
+  loadMediaBtn.addEventListener("click", async function () {
+    try {
+      setAlert(adminStatus, "info", "Chargement des medias...");
+      await loadMedia();
+      setAlert(adminStatus, "success", "Medias charges.");
+    } catch (error) {
+      setAlert(
+        adminStatus,
+        "danger",
+        "Impossible de charger les medias: " + error.message,
+      );
+    }
+  });
+
+  mediaUploadForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const file = mediaUploadFile.files && mediaUploadFile.files[0];
+    if (!file) {
+      setAlert(adminStatus, "warning", "Selectionne un fichier a uploader.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const altText = mediaUploadAlt.value.trim();
+    if (altText) {
+      formData.append("alt_text", altText);
+    }
+
+    const documentId = mediaUploadDocument.value.trim();
+    if (documentId) {
+      formData.append("document_id", documentId);
+    }
+
+    try {
+      setAlert(adminStatus, "info", "Upload du media en cours...");
+      await api("/admin/media", {
+        method: "POST",
+        body: formData,
+      });
+      mediaUploadForm.reset();
+      setAlert(adminStatus, "success", "Media upload avec succes.");
+      await loadMedia();
+    } catch (error) {
+      setAlert(
+        adminStatus,
+        "danger",
+        "Upload media impossible: " + error.message,
+      );
+    }
+  });
+
+  mediaBody.addEventListener("click", async function (event) {
+    const button = event.target.closest("button[data-action]");
+    if (!button) {
+      return;
+    }
+
+    const action = button.getAttribute("data-action");
+    const id = Number(button.getAttribute("data-id"));
+    if (!id) {
+      return;
+    }
+
+    if (action === "save-media") {
+      const altInput = mediaBody.querySelector('[data-media-alt="' + id + '"]');
+      const documentInput = mediaBody.querySelector(
+        '[data-media-document="' + id + '"]',
+      );
+
+      const body = {
+        alt_text: altInput ? altInput.value.trim() || null : null,
+        document_id:
+          documentInput && documentInput.value.trim()
+            ? Number(documentInput.value.trim())
+            : null,
+      };
+
+      try {
+        await api("/admin/media/" + id, {
+          method: "PATCH",
+          body: JSON.stringify(body),
+        });
+        setAlert(adminStatus, "success", "Media #" + id + " mis a jour.");
+        await loadMedia();
+      } catch (error) {
+        setAlert(
+          adminStatus,
+          "danger",
+          "Mise a jour media impossible: " + error.message,
+        );
+      }
+      return;
+    }
+
+    if (action === "delete-media") {
+      if (!window.confirm("Supprimer le media #" + id + " ?")) {
+        return;
+      }
+
+      try {
+        await api("/admin/media/" + id, { method: "DELETE" });
+        setAlert(adminStatus, "success", "Media supprime.");
+        await loadMedia();
+      } catch (error) {
+        setAlert(
+          adminStatus,
+          "danger",
+          "Suppression media impossible: " + error.message,
+        );
+      }
+    }
+  });
+
   dashboardQuickCreateForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
@@ -1482,6 +1666,7 @@
     tagsBody.innerHTML = "";
     sectionsBody.innerHTML = "";
     logsBody.innerHTML = "";
+    mediaBody.innerHTML = "";
     documentsBody.innerHTML = "";
     currentUserBadge.textContent = "Non connecte";
 
