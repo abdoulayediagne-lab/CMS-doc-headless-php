@@ -9,6 +9,7 @@ use App\Lib\Security\AuthGuard;
 use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
 use App\Repositories\DocumentVersionRepository;
+use App\Repositories\SectionRepository;
 
 class PutDocumentController extends AbstractController
 {
@@ -78,10 +79,135 @@ class PutDocumentController extends AbstractController
             );
         }
 
+        $allowedKeys = ['title', 'slug', 'content', 'status', 'section_id', 'meta_title', 'meta_description', 'sort_order', 'tags'];
+        $unexpectedKeys = array_diff(array_keys($payload), $allowedKeys);
+        if (!empty($unexpectedKeys)) {
+            return new Response(
+                json_encode(['error' => 'unexpected fields: ' . implode(', ', $unexpectedKeys)]),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
         $tagSlugs = null;
         if (array_key_exists('tags', $payload)) {
+            if (!is_array($payload['tags'])) {
+                return new Response(
+                    json_encode(['error' => 'tags must be an array']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
             $tagSlugs = $this->normalizeTagSlugs($payload['tags']);
             unset($payload['tags']);
+        }
+
+        if (array_key_exists('title', $payload)) {
+            $title = trim((string) $payload['title']);
+            if ($title === '' || mb_strlen($title) > 255) {
+                return new Response(
+                    json_encode(['error' => 'title must be between 1 and 255 chars']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $payload['title'] = $title;
+        }
+
+        if (array_key_exists('slug', $payload)) {
+            $slug = $this->normalizeSlug((string) $payload['slug']);
+            if ($slug === '' || mb_strlen($slug) > 280) {
+                return new Response(
+                    json_encode(['error' => 'invalid slug']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $payload['slug'] = $slug;
+        }
+
+        if (array_key_exists('content', $payload) && !is_string($payload['content'])) {
+            return new Response(
+                json_encode(['error' => 'content must be a string']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
+        if (array_key_exists('section_id', $payload)) {
+            if ($payload['section_id'] === null || $payload['section_id'] === '') {
+                $payload['section_id'] = null;
+            } else {
+                $sectionId = filter_var($payload['section_id'], FILTER_VALIDATE_INT);
+                if ($sectionId === false || $sectionId <= 0) {
+                    return new Response(
+                        json_encode(['error' => 'section_id must be a positive integer']),
+                        400,
+                        ['Content-Type' => 'application/json']
+                    );
+                }
+
+                $sectionRepository = new SectionRepository();
+                if ($sectionRepository->findById((int) $sectionId) === null) {
+                    return new Response(
+                        json_encode(['error' => 'section not found']),
+                        404,
+                        ['Content-Type' => 'application/json']
+                    );
+                }
+
+                $payload['section_id'] = (int) $sectionId;
+            }
+        }
+
+        if (array_key_exists('meta_title', $payload)) {
+            if ($payload['meta_title'] !== null && !is_string($payload['meta_title'])) {
+                return new Response(
+                    json_encode(['error' => 'meta_title must be a string or null']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $metaTitle = $payload['meta_title'] !== null ? trim((string) $payload['meta_title']) : null;
+            if ($metaTitle !== null && $metaTitle !== '' && mb_strlen($metaTitle) > 255) {
+                return new Response(
+                    json_encode(['error' => 'meta_title must be <= 255 chars']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $payload['meta_title'] = $metaTitle === '' ? null : $metaTitle;
+        }
+
+        if (array_key_exists('meta_description', $payload)) {
+            if ($payload['meta_description'] !== null && !is_string($payload['meta_description'])) {
+                return new Response(
+                    json_encode(['error' => 'meta_description must be a string or null']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $metaDescription = $payload['meta_description'] !== null ? trim((string) $payload['meta_description']) : null;
+            if ($metaDescription !== null && $metaDescription !== '' && mb_strlen($metaDescription) > 500) {
+                return new Response(
+                    json_encode(['error' => 'meta_description must be <= 500 chars']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $payload['meta_description'] = $metaDescription === '' ? null : $metaDescription;
+        }
+
+        if (array_key_exists('sort_order', $payload)) {
+            $sortOrder = filter_var($payload['sort_order'], FILTER_VALIDATE_INT);
+            if ($sortOrder === false) {
+                return new Response(
+                    json_encode(['error' => 'sort_order must be an integer']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $payload['sort_order'] = (int) $sortOrder;
         }
 
         if (isset($payload['status'])) {
@@ -220,5 +346,14 @@ class PutDocumentController extends AbstractController
         }
 
         return array_values(array_unique($normalized));
+    }
+
+    private function normalizeSlug(string $value): string
+    {
+        $slug = strtolower(trim($value));
+        $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+        $slug = preg_replace('/[\s-]+/', '-', $slug);
+
+        return trim($slug, '-');
     }
 }

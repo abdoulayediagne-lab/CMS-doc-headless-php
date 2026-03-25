@@ -36,7 +36,7 @@ class PatchUserController extends AbstractController {
 
         $role = null;
         if (array_key_exists('role', $payload)) {
-            $role = (string) $payload['role'];
+            $role = strtolower(trim((string) $payload['role']));
             $allowedRoles = ['reader', 'author', 'editor', 'admin'];
             if (!in_array($role, $allowedRoles, true)) {
                 return new Response(
@@ -57,6 +57,22 @@ class PatchUserController extends AbstractController {
                 );
             }
             $isActive = (bool) $payload['is_active'];
+        }
+
+        if ($role === null && $isActive === null) {
+            return new Response(
+                json_encode(['error' => 'nothing to update']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
+        if ($authorizedUser->getId() === $id && $isActive === false) {
+            return new Response(
+                json_encode(['error' => 'you cannot deactivate your own account']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
         }
 
         $userRepository = new UserRepository();

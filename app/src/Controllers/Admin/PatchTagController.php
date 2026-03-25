@@ -48,9 +48,9 @@ class PatchTagController extends AbstractController {
 
         if (array_key_exists('name', $payload)) {
             $name = trim((string) $payload['name']);
-            if ($name === '') {
+            if ($name === '' || mb_strlen($name) > 50) {
                 return new Response(
-                    json_encode(['error' => 'name cannot be empty']),
+                    json_encode(['error' => 'name must be between 1 and 50 chars']),
                     400,
                     ['Content-Type' => 'application/json']
                 );
@@ -60,7 +60,7 @@ class PatchTagController extends AbstractController {
 
         if (array_key_exists('slug', $payload)) {
             $slug = $this->normalizeSlug((string) $payload['slug']);
-            if ($slug === '') {
+            if ($slug === '' || mb_strlen($slug) > 60) {
                 return new Response(
                     json_encode(['error' => 'invalid slug']),
                     400,
@@ -78,6 +78,14 @@ class PatchTagController extends AbstractController {
             }
 
             $updateData['slug'] = $slug;
+        }
+
+        if (empty($updateData)) {
+            return new Response(
+                json_encode(['error' => 'nothing to update']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
         }
 
         $updatedTag = $tagRepository->updateTag($id, $updateData);
