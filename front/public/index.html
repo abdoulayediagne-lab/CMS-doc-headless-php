@@ -32,8 +32,20 @@
         <div class="card__body">
           <form id="search-form" class="form public-page__filters-form" novalidate>
             <div class="form__group">
-              <label class="form__label" for="search-input">Mot-cle</label>
+              <label class="form__label" for="search-input">Mot-clé</label>
               <input id="search-input" class="form__input" type="search" placeholder="Titre ou contenu" />
+            </div>
+            <div class="form__group">
+              <label class="form__label" for="section-filter">Section</label>
+              <select id="section-filter" class="form__select">
+                <option value="">Toutes les sections</option>
+              </select>
+            </div>
+            <div class="form__group">
+              <label class="form__label" for="tag-filter">Tag</label>
+              <select id="tag-filter" class="form__select">
+                <option value="">Tous les tags</option>
+              </select>
             </div>
             <button class="btn btn--primary" type="submit">Filtrer</button>
           </form>

@@ -107,6 +107,37 @@
   let knownTags = [];
   let knownSections = [];
 
+  function flattenSections(sections) {
+    const flat = [];
+
+    function walk(items) {
+      if (!Array.isArray(items)) {
+        return;
+      }
+
+      items.forEach(function (section) {
+        if (!section || typeof section !== "object") {
+          return;
+        }
+
+        flat.push({
+          id: Number(section.id),
+          name: section.name || section.slug || "Section",
+          slug: section.slug || "",
+        });
+
+        if (Array.isArray(section.children) && section.children.length > 0) {
+          walk(section.children);
+        }
+      });
+    }
+
+    walk(sections);
+    return flat.filter(function (section) {
+      return Number.isFinite(section.id) && section.id > 0;
+    });
+  }
+
   function setAlert(element, variant, message) {
     if (!element) {
       return;
@@ -442,14 +473,17 @@
       .join("");
   }
 
+  function buildMediaUsageSnippet(media) {
+    const publicUrl = API_BASE + (media.path || "");
+    const alt = (media.alt_text || media.filename || "media").trim();
+    return "![" + alt.replace(/\]/g, "") + "](" + publicUrl + ")";
+  }
+
   async function loadPublicTaxonomies() {
     try {
-      const [sectionsPayload, tagsPayload] = await Promise.all([
-        api("/public/sections?limit=200&page=1", { method: "GET" }),
-        api("/public/tags?limit=200&page=1", { method: "GET" }),
-      ]);
-      knownSections = sectionsPayload.data || [];
-      knownTags = tagsPayload.data || [];
+      const payload = await api("/public/taxonomies", { method: "GET" });
+      knownSections = flattenSections(payload.sections || []);
+      knownTags = payload.tags || [];
       renderTaxonomySelectors();
     } catch (error) {
       // Keep UI usable even if taxonomies are unavailable.
@@ -495,6 +529,7 @@
           Array.isArray(doc.tags) && doc.tags.length > 0
             ? doc.tags.join(", ")
             : "-";
+        const section = doc.section_name || doc.section_slug || "-";
         const actions = [
           '<button class="btn btn--outline btn--sm" type="button" data-action="view" data-id="' +
             doc.id +
@@ -524,6 +559,9 @@
           "</td>" +
           "<td>" +
           escapeHtml(doc.title || "-") +
+          "</td>" +
+          "<td>" +
+          escapeHtml(section) +
           "</td>" +
           "<td>" +
           escapeHtml(doc.author_name || "-") +
@@ -703,7 +741,7 @@
           " /></td>" +
           '<td class="backoffice-page__row-actions"><button class="btn btn--secondary btn--sm" type="button" data-action="save-user" data-id="' +
           user.id +
-          '">Sauver</button><button class="btn btn--danger btn--sm" type="button" data-action="delete-user" data-id="' +
+              '">Sauvegarder</button><button class="btn btn--danger btn--sm" type="button" data-action="delete-user" data-id="' +
           user.id +
           '">Supprimer</button></td>' +
           "</tr>"
@@ -787,7 +825,7 @@
           '<td class="backoffice-page__row-actions">' +
           '<button class="btn btn--secondary btn--sm" type="button" data-action="save-tag" data-id="' +
           tag.id +
-          '">Sauver</button> ' +
+          '">Sauvegarder</button> ' +
           '<button class="btn btn--danger btn--sm" type="button" data-action="delete-tag" data-id="' +
           tag.id +
           '">Supprimer</button>' +
@@ -836,7 +874,7 @@
           '<td class="backoffice-page__row-actions">' +
           '<button class="btn btn--secondary btn--sm" type="button" data-action="save-section" data-id="' +
           section.id +
-          '">Sauver</button> ' +
+          '">Sauvegarder</button> ' +
           '<button class="btn btn--danger btn--sm" type="button" data-action="delete-section" data-id="' +
           section.id +
           '">Supprimer</button>' +
@@ -901,6 +939,7 @@
     mediaBody.innerHTML = (items || [])
       .map(function (media) {
         const publicUrl = API_BASE + (media.path || "");
+        const usageSnippet = buildMediaUsageSnippet(media);
         return (
           "<tr>" +
           "<td>" +
@@ -925,13 +964,19 @@
           "<td>" +
           escapeHtml(String(media.file_size || 0)) +
           "</td>" +
+          '<td><input class="form__input" type="text" value="' +
+          escapeHtml(usageSnippet) +
+          '" readonly /></td>' +
           '<td><a class="btn btn--outline btn--sm" href="' +
           escapeHtml(publicUrl) +
           '" target="_blank" rel="noopener noreferrer">Ouvrir</a></td>' +
           '<td class="backoffice-page__row-actions">' +
+          '<button class="btn btn--outline btn--sm" type="button" data-action="copy-media-link" data-id="' +
+          media.id +
+          '">Copier</button> ' +
           '<button class="btn btn--secondary btn--sm" type="button" data-action="save-media" data-id="' +
           media.id +
-          '">Sauver</button> ' +
+          '">Sauvegarder</button> ' +
           '<button class="btn btn--danger btn--sm" type="button" data-action="delete-media" data-id="' +
           media.id +
           '">Supprimer</button>' +
@@ -1543,6 +1588,34 @@
     const action = button.getAttribute("data-action");
     const id = Number(button.getAttribute("data-id"));
     if (!id) {
+      return;
+    }
+
+    if (action === "copy-media-link") {
+      const row = button.closest("tr");
+      const input = row ? row.querySelector("input[readonly]") : null;
+      if (!input) {
+        return;
+      }
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(input.value);
+        } else {
+          input.focus();
+          input.select();
+          document.execCommand("copy");
+          input.setSelectionRange(0, 0);
+          input.blur();
+        }
+        setAlert(adminStatus, "success", "Snippet média copié.");
+      } catch (error) {
+        setAlert(
+          adminStatus,
+          "danger",
+          "Copie impossible: " + error.message,
+        );
+      }
       return;
     }
 

@@ -32,7 +32,7 @@ class DocumentRepository extends AbstractRepository {
     }
 
     public function findAllPaginated(int $limit = 20, int $offset = 0, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null, ?string $search = null): array {
-        $query = 'SELECT DISTINCT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
+        $query = 'SELECT DISTINCT d.*, u.username AS author_name, s.name AS section_name, s.slug AS section_slug FROM documents d LEFT JOIN users u ON u.id = d.author_id LEFT JOIN sections s ON s.id = d.section_id';
         $params = [];
         $whereClauses = [];
 
@@ -76,7 +76,7 @@ class DocumentRepository extends AbstractRepository {
     }
 
     public function findVisibleForEditor(int $editorId, int $limit = 20, int $offset = 0, ?string $status = null, ?int $sectionId = null, ?string $tagSlug = null, ?string $search = null): array {
-        $query = 'SELECT DISTINCT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
+        $query = 'SELECT DISTINCT d.*, u.username AS author_name, s.name AS section_name, s.slug AS section_slug FROM documents d LEFT JOIN users u ON u.id = d.author_id LEFT JOIN sections s ON s.id = d.section_id';
         $params = ['editor_id' => $editorId];
         $whereClauses = [];
 
@@ -204,7 +204,7 @@ class DocumentRepository extends AbstractRepository {
     }
 
     public function findPublicPaginated(int $limit = 20, int $offset = 0, ?int $sectionId = null, ?string $tagSlug = null, ?string $search = null): array {
-        $query = 'SELECT DISTINCT d.*, u.username AS author_name FROM documents d LEFT JOIN users u ON u.id = d.author_id';
+        $query = 'SELECT DISTINCT d.*, u.username AS author_name, s.name AS section_name, s.slug AS section_slug FROM documents d LEFT JOIN users u ON u.id = d.author_id LEFT JOIN sections s ON s.id = d.section_id';
         $params = ['status' => 'published'];
         $whereClauses = ['d.status = :status'];
 
