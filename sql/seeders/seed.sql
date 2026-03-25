@@ -27,14 +27,19 @@ INSERT INTO sections (parent_id, name, slug, description, sort_order) VALUES
 -- ============================================
 INSERT INTO documents (section_id, author_id, title, slug, content, status, meta_title, meta_description, sort_order, published_at) VALUES
     (4, 1, 'Installation avec Docker', 'installation-docker', 'Ce guide vous montre comment installer le CMS avec Docker et docker-compose. Prérequis : Docker Desktop installé sur votre machine.', 'published', 'Installation Docker - CMS Wiki', 'Guide complet pour installer le CMS Wiki avec Docker', 1, NOW()),
-    (5, 1, 'Configuration de la base de données', 'configuration-bdd', 'Le CMS utilise PostgreSQL 18. Voici comment configurer votre connexion à la base de données.', 'published', 'Configuration BDD - CMS Wiki', 'Configurer PostgreSQL 18 pour le CMS', 2, NOW());
+    (5, 1, 'Configuration de la base de données', 'configuration-bdd', 'Le CMS utilise PostgreSQL 18. Voici comment configurer votre connexion à la base de données et vérifier que les migrations sont bien appliquées. Pensez à adapter les variables d environnement pour votre poste de développement.', 'published', 'Configuration BDD - CMS Wiki', 'Configurer PostgreSQL 18 pour le CMS', 2, NOW()),
+    (6, 2, 'Schema des entités principales', 'schema-entites-principales', 'Cette page présente les entités clés : users, sections, documents, document_versions, tags, media et audit_log. Elle explique les liens entre ces tables et les contraintes à respecter pour garder une base cohérente.', 'published', 'Schéma des entités - CMS Wiki', 'Comprendre le modèle de données principal du CMS', 3, NOW()),
+    (3, 2, 'API publique : recherche et filtres', 'api-publique-recherche-filtres', 'L endpoint /public/documents accepte les filtres q, section_id et tag. Utilisez ces paramètres pour construire une navigation efficace côté front public et améliorer la découvrabilité du contenu.', 'published', 'API publique et filtres - CMS Wiki', 'Utiliser les filtres de l API publique', 4, NOW());
 
 -- ============================================
 -- DOCUMENT VERSIONS
 -- ============================================
 INSERT INTO document_versions (document_id, author_id, title, content, version_number) VALUES
     (1, 1, 'Installation avec Docker', 'Premier brouillon du guide d installation.', 1),
-    (1, 1, 'Installation avec Docker', 'Ce guide vous montre comment installer le CMS avec Docker et docker-compose. Prérequis : Docker Desktop installé sur votre machine.', 2);
+    (1, 1, 'Installation avec Docker', 'Ce guide vous montre comment installer le CMS avec Docker et docker-compose. Prérequis : Docker Desktop installé sur votre machine.', 2),
+    (2, 1, 'Configuration de la base de données', 'Version initiale du guide de configuration PostgreSQL.', 1),
+    (3, 2, 'Schema des entités principales', 'Version initiale de la documentation technique des entités.', 1),
+    (4, 2, 'API publique : recherche et filtres', 'Version initiale de la documentation des filtres publics.', 1);
 
 -- ============================================
 -- TAGS
@@ -53,7 +58,11 @@ INSERT INTO document_tags (document_id, tag_id) VALUES
     (1, 1),
     (1, 4),
     (2, 2),
-    (2, 5);
+    (2, 5),
+    (3, 2),
+    (3, 3),
+    (4, 3),
+    (4, 5);
 
 -- ============================================
 -- PAGE VIEWS (analytics)
@@ -63,7 +72,9 @@ INSERT INTO page_views (document_id, ip_address, user_agent, viewed_at) VALUES
     (1, '192.168.1.11', 'Mozilla/5.0', NOW() - INTERVAL '1 day'),
     (1, '192.168.1.12', 'Mozilla/5.0', NOW()),
     (2, '192.168.1.10', 'Mozilla/5.0', NOW() - INTERVAL '1 day'),
-    (2, '192.168.1.13', 'Mozilla/5.0', NOW());
+    (2, '192.168.1.13', 'Mozilla/5.0', NOW()),
+    (3, '192.168.1.14', 'Mozilla/5.0', NOW() - INTERVAL '3 hours'),
+    (4, '192.168.1.15', 'Mozilla/5.0', NOW() - INTERVAL '2 hours');
 
 -- ============================================
 -- AUDIT LOG
@@ -71,4 +82,6 @@ INSERT INTO page_views (document_id, ip_address, user_agent, viewed_at) VALUES
 INSERT INTO audit_log (user_id, action, entity_type, entity_id, new_values) VALUES
     (1, 'create', 'document', 1, '{"title": "Installation avec Docker"}'),
     (1, 'publish', 'document', 1, '{"status": "published"}'),
-    (1, 'create', 'document', 2, '{"title": "Configuration de la base de données"}');
+    (1, 'create', 'document', 2, '{"title": "Configuration de la base de données"}'),
+    (2, 'create', 'document', 3, '{"title": "Schema des entités principales"}'),
+    (2, 'create', 'document', 4, '{"title": "API publique : recherche et filtres"}');
