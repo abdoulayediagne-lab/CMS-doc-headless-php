@@ -80,6 +80,11 @@
     "controller": "PublicDocument\\GetPublicSectionsController"
   },
   {
+    "path": "/public/sections/:slug",
+    "method": "GET",
+    "controller": "PublicDocument\\GetPublicSectionDocumentsController"
+  },
+  {
     "path": "/public/tags",
     "method": "GET",
     "controller": "PublicDocument\\GetPublicTagsController"
