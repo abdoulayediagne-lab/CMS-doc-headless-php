@@ -145,6 +145,26 @@
     "controller": "Admin\\DeleteSectionController"
   },
   {
+    "path": "/admin/media",
+    "method": "GET",
+    "controller": "Admin\\GetMediaController"
+  },
+  {
+    "path": "/admin/media",
+    "method": "POST",
+    "controller": "Admin\\PostMediaController"
+  },
+  {
+    "path": "/admin/media/:id",
+    "method": "PATCH",
+    "controller": "Admin\\PatchMediaController"
+  },
+  {
+    "path": "/admin/media/:id",
+    "method": "DELETE",
+    "controller": "Admin\\DeleteMediaController"
+  },
+  {
     "path": "/sitemap.xml",
     "method": "GET",
     "controller": "PublicDocument\\GetSitemapController"
