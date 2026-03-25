@@ -21,8 +21,17 @@ class PostLoginController extends AbstractController {
             );
         }
 
+        $email = strtolower(trim((string) $payload['email']));
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 255) {
+            return new Response(
+                json_encode(['error' => 'invalid email format']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
         $userRepository = new UserRepository();
-        $user = $userRepository->findByEmail((string) $payload['email']);
+        $user = $userRepository->findByEmail($email);
 
         if ($user === null || !$user->verifyPassword((string) $payload['password'])) {
             return new Response(

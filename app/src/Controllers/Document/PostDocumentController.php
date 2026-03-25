@@ -8,6 +8,7 @@ use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
 use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
+use App\Repositories\SectionRepository;
 
 class PostDocumentController extends AbstractController
 {
@@ -31,10 +32,138 @@ class PostDocumentController extends AbstractController
             );
         }
 
+        $allowedKeys = ['title', 'slug', 'content', 'status', 'section_id', 'meta_title', 'meta_description', 'sort_order', 'tags'];
+        $unexpectedKeys = array_diff(array_keys($payload), $allowedKeys);
+        if (!empty($unexpectedKeys)) {
+            return new Response(
+                json_encode(['error' => 'unexpected fields: ' . implode(', ', $unexpectedKeys)]),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
         $title = trim((string) $payload['title']);
-        $slug = $payload['slug'] ?? $this->generateSlug($title);
+        if ($title === '' || mb_strlen($title) > 255) {
+            return new Response(
+                json_encode(['error' => 'title must be between 1 and 255 chars']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
+        $slugInput = array_key_exists('slug', $payload) ? (string) $payload['slug'] : $title;
+        $slug = $this->generateSlug($slugInput);
+        if ($slug === '' || mb_strlen($slug) > 280) {
+            return new Response(
+                json_encode(['error' => 'invalid slug']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
         $status = $payload['status'] ?? 'draft';
+        if (!is_string($status)) {
+            return new Response(
+                json_encode(['error' => 'status must be a string']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
+        if (array_key_exists('tags', $payload) && !is_array($payload['tags'])) {
+            return new Response(
+                json_encode(['error' => 'tags must be an array']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
         $tagSlugs = $this->normalizeTagSlugs($payload['tags'] ?? []);
+
+        $content = $payload['content'] ?? '';
+        if (!is_string($content)) {
+            return new Response(
+                json_encode(['error' => 'content must be a string']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
+        $sectionId = null;
+        if (array_key_exists('section_id', $payload) && $payload['section_id'] !== null && $payload['section_id'] !== '') {
+            $sectionId = filter_var($payload['section_id'], FILTER_VALIDATE_INT);
+            if ($sectionId === false || $sectionId <= 0) {
+                return new Response(
+                    json_encode(['error' => 'section_id must be a positive integer']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+
+            $sectionRepository = new SectionRepository();
+            if ($sectionRepository->findById((int) $sectionId) === null) {
+                return new Response(
+                    json_encode(['error' => 'section not found']),
+                    404,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+        }
+
+        $metaTitle = $payload['meta_title'] ?? null;
+        if ($metaTitle !== null) {
+            if (!is_string($metaTitle)) {
+                return new Response(
+                    json_encode(['error' => 'meta_title must be a string or null']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $metaTitle = trim($metaTitle);
+            if ($metaTitle === '') {
+                $metaTitle = null;
+            } elseif (mb_strlen($metaTitle) > 255) {
+                return new Response(
+                    json_encode(['error' => 'meta_title must be <= 255 chars']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+        }
+
+        $metaDescription = $payload['meta_description'] ?? null;
+        if ($metaDescription !== null) {
+            if (!is_string($metaDescription)) {
+                return new Response(
+                    json_encode(['error' => 'meta_description must be a string or null']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $metaDescription = trim($metaDescription);
+            if ($metaDescription === '') {
+                $metaDescription = null;
+            } elseif (mb_strlen($metaDescription) > 500) {
+                return new Response(
+                    json_encode(['error' => 'meta_description must be <= 500 chars']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+        }
+
+        $sortOrder = 0;
+        if (array_key_exists('sort_order', $payload)) {
+            $sortOrderCandidate = filter_var($payload['sort_order'], FILTER_VALIDATE_INT);
+            if ($sortOrderCandidate === false) {
+                return new Response(
+                    json_encode(['error' => 'sort_order must be an integer']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $sortOrder = (int) $sortOrderCandidate;
+        }
 
         $allowedStatuses = ['draft', 'review', 'published', 'archived'];
         if (!in_array($status, $allowedStatuses, true)) {
@@ -58,13 +187,13 @@ class PostDocumentController extends AbstractController
         $document = $documentRepository->create([
             'title' => $title,
             'slug' => $slug,
-            'content' => $payload['content'] ?? '',
+            'content' => $content,
             'status' => $status,
-            'section_id' => $payload['section_id'] ?? null,
+            'section_id' => $sectionId,
             'author_id' => $user->getId(),
-            'meta_title' => $payload['meta_title'] ?? null,
-            'meta_description' => $payload['meta_description'] ?? null,
-            'sort_order' => $payload['sort_order'] ?? 0,
+            'meta_title' => $metaTitle,
+            'meta_description' => $metaDescription,
+            'sort_order' => $sortOrder,
         ]);
 
         if ($document === null) {

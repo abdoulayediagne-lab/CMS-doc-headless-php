@@ -27,9 +27,33 @@ class PostRegisterController extends AbstractController {
         $email = strtolower(trim((string) $payload['email']));
         $password = (string) $payload['password'];
 
+        if ($username === '' || mb_strlen($username) < 2 || mb_strlen($username) > 50) {
+            return new Response(
+                json_encode(['error' => 'username must be between 2 and 50 characters']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
+        if (!preg_match('/^[a-zA-Z0-9._-]+$/', $username)) {
+            return new Response(
+                json_encode(['error' => 'username contains invalid characters']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return new Response(
                 json_encode(['error' => 'invalid email format']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
+        if (mb_strlen($email) > 255) {
+            return new Response(
+                json_encode(['error' => 'email must be <= 255 characters']),
                 400,
                 ['Content-Type' => 'application/json']
             );

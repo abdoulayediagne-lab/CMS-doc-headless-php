@@ -26,8 +26,16 @@ class PostTagController extends AbstractController {
         }
 
         $name = trim((string) $payload['name']);
+        if ($name === '' || mb_strlen($name) > 50) {
+            return new Response(
+                json_encode(['error' => 'name must be between 1 and 50 chars']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
         $slug = isset($payload['slug']) ? $this->normalizeSlug((string) $payload['slug']) : $this->normalizeSlug($name);
-        if ($slug === '') {
+        if ($slug === '' || mb_strlen($slug) > 60) {
             return new Response(
                 json_encode(['error' => 'invalid slug']),
                 400,

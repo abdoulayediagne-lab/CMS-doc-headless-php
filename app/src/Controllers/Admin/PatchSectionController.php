@@ -48,9 +48,9 @@ class PatchSectionController extends AbstractController {
 
         if (array_key_exists('name', $payload)) {
             $name = trim((string) $payload['name']);
-            if ($name === '') {
+            if ($name === '' || mb_strlen($name) > 100) {
                 return new Response(
-                    json_encode(['error' => 'name cannot be empty']),
+                    json_encode(['error' => 'name must be between 1 and 100 chars']),
                     400,
                     ['Content-Type' => 'application/json']
                 );
@@ -60,7 +60,7 @@ class PatchSectionController extends AbstractController {
 
         if (array_key_exists('slug', $payload)) {
             $slug = $this->normalizeSlug((string) $payload['slug']);
-            if ($slug === '') {
+            if ($slug === '' || mb_strlen($slug) > 120) {
                 return new Response(
                     json_encode(['error' => 'invalid slug']),
                     400,
@@ -95,11 +95,34 @@ class PatchSectionController extends AbstractController {
         }
 
         if (array_key_exists('description', $payload)) {
+            if ($payload['description'] !== null && !is_string($payload['description'])) {
+                return new Response(
+                    json_encode(['error' => 'description must be a string or null']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
             $updateData['description'] = $payload['description'];
         }
 
         if (array_key_exists('sort_order', $payload)) {
-            $updateData['sort_order'] = (int) $payload['sort_order'];
+            $sortOrderCandidate = filter_var($payload['sort_order'], FILTER_VALIDATE_INT);
+            if ($sortOrderCandidate === false) {
+                return new Response(
+                    json_encode(['error' => 'sort_order must be an integer']),
+                    400,
+                    ['Content-Type' => 'application/json']
+                );
+            }
+            $updateData['sort_order'] = (int) $sortOrderCandidate;
+        }
+
+        if (empty($updateData)) {
+            return new Response(
+                json_encode(['error' => 'nothing to update']),
+                400,
+                ['Content-Type' => 'application/json']
+            );
         }
 
         $updatedSection = $sectionRepository->updateSection($id, $updateData);
