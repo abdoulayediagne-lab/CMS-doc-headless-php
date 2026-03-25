@@ -8,9 +8,11 @@ use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
 use App\Repositories\DocumentRepository;
 
-class GetDocumentsController extends AbstractController {
+class GetDocumentsController extends AbstractController
+{
 
-    public function process(Request $request): Response {
+    public function process(Request $request): Response
+    {
         $authGuard = new AuthGuard();
         $user = $authGuard->authorize($request);
         if ($user instanceof Response) {
@@ -55,10 +57,10 @@ class GetDocumentsController extends AbstractController {
             );
         }
 
-        if ($user->getRole() === 'admin') {
+        if ($user->getRole() === 'admin' || $user->getRole() === 'editor') {
             $documents = $documentRepository->findAllPaginated($limit, $offset, $status, $sectionId, $tagSlug, $search);
             $total = $documentRepository->countAll($status, $sectionId, $tagSlug, $search);
-        } elseif ($user->getRole() === 'editor') {
+        } elseif ($user->getRole() === 'author') {
             $documents = $documentRepository->findVisibleForEditor($user->getId(), $limit, $offset, $status, $sectionId, $tagSlug, $search);
             $total = $documentRepository->countVisibleForEditor($user->getId(), $status, $sectionId, $tagSlug, $search);
         } else {
@@ -94,5 +96,3 @@ class GetDocumentsController extends AbstractController {
         );
     }
 }
-
-?>

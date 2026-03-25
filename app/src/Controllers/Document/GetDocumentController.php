@@ -8,9 +8,11 @@ use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
 use App\Repositories\DocumentRepository;
 
-class GetDocumentController extends AbstractController {
+class GetDocumentController extends AbstractController
+{
 
-    public function process(Request $request): Response {
+    public function process(Request $request): Response
+    {
         $authGuard = new AuthGuard();
         $user = $authGuard->authorize($request);
         if ($user instanceof Response) {
@@ -37,9 +39,9 @@ class GetDocumentController extends AbstractController {
             );
         }
 
-        if ($user->getRole() !== 'admin') {
-            $isEditorOwner = $user->getRole() === 'editor' && $document->author_id === $user->getId();
-            if (!$document->isPublished() && !$isEditorOwner) {
+        if (!in_array($user->getRole(), ['admin', 'editor'], true)) {
+            $isAuthorOwner = $user->getRole() === 'author' && $document->author_id === $user->getId();
+            if (!$document->isPublished() && !$isAuthorOwner) {
                 return new Response(
                     json_encode(['error' => 'document not found']),
                     404,
@@ -73,5 +75,3 @@ class GetDocumentController extends AbstractController {
         );
     }
 }
-
-?>

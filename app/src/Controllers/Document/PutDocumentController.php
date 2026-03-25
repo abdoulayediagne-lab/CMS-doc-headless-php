@@ -10,7 +10,8 @@ use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
 use App\Repositories\DocumentVersionRepository;
 
-class PutDocumentController extends AbstractController {
+class PutDocumentController extends AbstractController
+{
 
     private const TRANSITIONS = [
         'draft'     => ['review'],
@@ -19,7 +20,8 @@ class PutDocumentController extends AbstractController {
         'archived'  => ['draft'],
     ];
 
-    public function process(Request $request): Response {
+    public function process(Request $request): Response
+    {
         // Admin, editor et author peuvent modifier
         $authGuard = new AuthGuard();
         $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
@@ -58,8 +60,8 @@ class PutDocumentController extends AbstractController {
             'sort_order' => $document->sort_order,
         ];
 
-        // Un author/editor ne peut modifier que ses propres documents
-        if (in_array($user->getRole(), ['editor', 'author']) && $document->author_id !== $user->getId()) {
+        // Un author ne peut modifier que ses propres documents
+        if ($user->getRole() === 'author' && $document->author_id !== $user->getId()) {
             return new Response(
                 json_encode(['error' => 'forbidden: you can only edit your own documents']),
                 403,
@@ -74,16 +76,6 @@ class PutDocumentController extends AbstractController {
                 400,
                 ['Content-Type' => 'application/json']
             );
-        }
-
-        if ($user->getRole() === 'author') {
-            if (isset($payload['status']) && $payload['status'] !== 'review') {
-                return new Response(
-                    json_encode(['error' => 'authors can only submit for review (draft → review)']),
-                    403,
-                    ['Content-Type' => 'application/json']
-                );
-            }
         }
 
         $tagSlugs = null;
@@ -205,7 +197,8 @@ class PutDocumentController extends AbstractController {
         );
     }
 
-    private function normalizeTagSlugs(mixed $tags): array {
+    private function normalizeTagSlugs(mixed $tags): array
+    {
         if (!is_array($tags)) {
             return [];
         }
@@ -229,5 +222,3 @@ class PutDocumentController extends AbstractController {
         return array_values(array_unique($normalized));
     }
 }
-
-?>

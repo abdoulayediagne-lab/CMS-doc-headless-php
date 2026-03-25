@@ -9,12 +9,15 @@ use App\Lib\Security\AuthGuard;
 use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
 
-class DeleteDocumentController extends AbstractController {
+class DeleteDocumentController extends AbstractController
+{
 
-    public function process(Request $request): Response {
-        // Seuls admin peuvent supprimer
+    public function process(Request $request): Response
+    {
+        // Admin et editor peuvent supprimer n'importe quel document.
+        // Author peut supprimer uniquement ses propres documents.
         $authGuard = new AuthGuard();
-        $user = $authGuard->authorize($request, ['admin']);
+        $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
         if ($user instanceof Response) {
             return $user;
         }
@@ -35,6 +38,14 @@ class DeleteDocumentController extends AbstractController {
             return new Response(
                 json_encode(['error' => 'document not found']),
                 404,
+                ['Content-Type' => 'application/json']
+            );
+        }
+
+        if ($user->getRole() === 'author' && $document->author_id !== $user->getId()) {
+            return new Response(
+                json_encode(['error' => 'forbidden: authors can only delete their own documents']),
+                403,
                 ['Content-Type' => 'application/json']
             );
         }
@@ -69,5 +80,3 @@ class DeleteDocumentController extends AbstractController {
         return new Response('', 204, ['Content-Type' => 'application/json']);
     }
 }
-
-?>

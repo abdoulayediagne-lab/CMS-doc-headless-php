@@ -8,9 +8,11 @@ use App\Lib\Http\Response;
 use App\Lib\Security\AuthGuard;
 use App\Repositories\DocumentRepository;
 
-class GetDocumentPreviewController extends AbstractController {
+class GetDocumentPreviewController extends AbstractController
+{
 
-    public function process(Request $request): Response {
+    public function process(Request $request): Response
+    {
         // Aperçu avant publication (exigé par la consigne)
         $authGuard = new AuthGuard();
         $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
@@ -38,8 +40,8 @@ class GetDocumentPreviewController extends AbstractController {
             );
         }
 
-        // Un author/editor ne peut prévisualiser que ses propres documents
-        if (in_array($user->getRole(), ['editor', 'author']) && $document->author_id !== $user->getId()) {
+        // Un author ne peut prévisualiser que ses propres documents
+        if ($user->getRole() === 'author' && $document->author_id !== $user->getId()) {
             return new Response(
                 json_encode(['error' => 'forbidden']),
                 403,
@@ -74,5 +76,3 @@ class GetDocumentPreviewController extends AbstractController {
         );
     }
 }
-
-?>

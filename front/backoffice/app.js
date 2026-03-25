@@ -142,7 +142,7 @@
   function canCreateDocuments() {
     return (
       isAuthenticated() &&
-      (currentUser.role === "admin" || currentUser.role === "editor")
+      ["admin", "editor", "author"].indexOf(currentUser.role) >= 0
     );
   }
 
@@ -157,11 +157,24 @@
     if (!currentUser) {
       return false;
     }
-    if (currentUser.role === "admin") {
+    if (currentUser.role === "admin" || currentUser.role === "editor") {
       return true;
     }
     return (
-      ["editor", "author"].indexOf(currentUser.role) >= 0 &&
+      currentUser.role === "author" &&
+      Number(doc.author_id) === Number(currentUser.id)
+    );
+  }
+
+  function canDeleteDocument(doc) {
+    if (!currentUser) {
+      return false;
+    }
+    if (currentUser.role === "admin" || currentUser.role === "editor") {
+      return true;
+    }
+    return (
+      currentUser.role === "author" &&
       Number(doc.author_id) === Number(currentUser.id)
     );
   }
@@ -298,12 +311,12 @@
       setAlert(
         dashboardAlert,
         "success",
-        "Tu as acces aux outils d'administration ci-dessous.",
+        "Admin: gestion complete des utilisateurs, tags, sections, logs et documents.",
       );
       setAlert(adminStatus, "info", "Gestion admin active.");
       dashboardRoleTitle.textContent = "Actions rapides";
       dashboardRoleDescription.textContent =
-        "Tu peux gerer le backoffice et creer rapidement un document.";
+        "Tu peux creer, modifier et supprimer n'importe quel document.\nTu geres aussi toute la configuration du backoffice.";
       dashboardQuickCreateForm.hidden = false;
       dashboardQuickCreateStatus.hidden = false;
       setAlert(
@@ -317,38 +330,41 @@
       setAlert(
         dashboardAlert,
         "info",
-        "Tu peux gerer tes documents depuis ce dashboard ou l'onglet Documents.",
+        "Editeur: creation, modification et suppression de tous les documents.",
       );
       dashboardRoleTitle.textContent = "Creation rapide";
       dashboardRoleDescription.textContent =
-        "Creer un document ici, puis gere la liste detaillee dans l'onglet Documents.";
+        "Tu peux creer, modifier et supprimer n'importe quel document.\nTu n'as pas acces a l'administration utilisateurs/tags/sections/logs.";
       dashboardQuickCreateForm.hidden = false;
       dashboardQuickCreateStatus.hidden = false;
       setAlert(
         dashboardQuickCreateStatus,
         "info",
-        "Tu peux creer des documents et modifier les tiens.",
+        "Tu peux creer, modifier et supprimer n'importe quel document.",
       );
     } else if (currentUser.role === "author") {
       dashboardAdmin.hidden = true;
       setAlert(
         dashboardAlert,
         "info",
-        "Role auteur: edition limitee aux documents dont tu es proprietaire.",
+        "Auteur: droits limites a tes propres documents.",
       );
       dashboardRoleTitle.textContent = "Navigation auteur";
       dashboardRoleDescription.textContent =
-        "Ce role ne cree pas de nouveau document ici. Utilise l'onglet Documents pour consulter le contenu disponible.";
+        "Tu peux creer des documents.\nTu peux modifier et supprimer uniquement les documents dont tu es l'auteur.";
+      dashboardQuickCreateForm.hidden = false;
+      dashboardQuickCreateStatus.hidden = false;
+      setAlert(
+        dashboardQuickCreateStatus,
+        "info",
+        "Tu peux creer des documents et gerer uniquement ceux que tu as crees.",
+      );
     } else {
       dashboardAdmin.hidden = true;
-      setAlert(
-        dashboardAlert,
-        "info",
-        "Compte lecteur: acces en lecture uniquement.",
-      );
+      setAlert(dashboardAlert, "info", "Lecteur: acces en lecture uniquement.");
       dashboardRoleTitle.textContent = "Acces lecture";
       dashboardRoleDescription.textContent =
-        "Tu n'as pas de droits CRUD dans le backoffice. Ouvre la vitrine publique pour lire les documents.";
+        "Tu ne peux ni creer, ni modifier, ni supprimer de document.\nTu peux consulter les documents publies via la vitrine publique.";
       dashboardOpenDocuments.hidden = true;
       dashboardOpenPublic.hidden = false;
     }
@@ -480,7 +496,7 @@
           );
         }
 
-        if (isAdmin()) {
+        if (canDeleteDocument(doc)) {
           actions.push(
             '<button class="btn btn--danger btn--sm" type="button" data-action="delete" data-id="' +
               doc.id +
@@ -552,7 +568,7 @@
     setAlert(
       documentFormStatus,
       "info",
-      "Creation reservee aux editeurs/admins. Les auteurs peuvent modifier leurs documents existants.",
+      "Creation autorisee pour admin, editeur et auteur. Modification/suppression limitee aux droits du role.",
     );
   }
 
@@ -1007,14 +1023,21 @@
     }
 
     if (action === "delete") {
-      if (!isAdmin()) {
-        return;
-      }
-      if (!window.confirm("Supprimer le document #" + id + " ?")) {
-        return;
-      }
-
       try {
+        const payload = await api("/documents/" + id, { method: "GET" });
+        if (!canDeleteDocument(payload)) {
+          setAlert(
+            documentsStatus,
+            "warning",
+            "Tu ne peux supprimer que les documents autorises par ton role.",
+          );
+          return;
+        }
+
+        if (!window.confirm("Supprimer le document #" + id + " ?")) {
+          return;
+        }
+
         await api("/documents/" + id, { method: "DELETE" });
         setAlert(documentsStatus, "success", "Document supprime.");
         loadDocuments();
@@ -1061,7 +1084,7 @@
       setAlert(
         documentFormStatus,
         "warning",
-        "Creation reservee aux editeurs/admins.",
+        "Creation reservee aux roles admin, editeur et auteur.",
       );
       return;
     }
@@ -1396,7 +1419,7 @@
       setAlert(
         dashboardQuickCreateStatus,
         "warning",
-        "Creation reservee aux editeurs/admins.",
+        "Creation reservee aux roles admin, editeur et auteur.",
       );
       return;
     }

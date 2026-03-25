@@ -9,12 +9,14 @@ use App\Lib\Security\AuthGuard;
 use App\Repositories\AuditLogRepository;
 use App\Repositories\DocumentRepository;
 
-class PostDocumentController extends AbstractController {
+class PostDocumentController extends AbstractController
+{
 
-    public function process(Request $request): Response {
-        // Seuls admin et editor peuvent créer des documents
+    public function process(Request $request): Response
+    {
+        // Admin, editor et author peuvent créer des documents
         $authGuard = new AuthGuard();
-        $user = $authGuard->authorize($request, ['admin', 'editor']);
+        $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
         if ($user instanceof Response) {
             return $user;
         }
@@ -109,14 +111,16 @@ class PostDocumentController extends AbstractController {
         );
     }
 
-    private function generateSlug(string $title): string {
+    private function generateSlug(string $title): string
+    {
         $slug = strtolower($title);
         $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
         $slug = preg_replace('/[\s-]+/', '-', $slug);
         return trim($slug, '-');
     }
 
-    private function normalizeTagSlugs(mixed $tags): array {
+    private function normalizeTagSlugs(mixed $tags): array
+    {
         if (!is_array($tags)) {
             return [];
         }
@@ -140,5 +144,3 @@ class PostDocumentController extends AbstractController {
         return array_values(array_unique($normalized));
     }
 }
-
-?>

@@ -9,9 +9,11 @@ use App\Lib\Security\AuthGuard;
 use App\Repositories\DocumentRepository;
 use App\Repositories\DocumentVersionRepository;
 
-class GetDocumentVersionsController extends AbstractController {
+class GetDocumentVersionsController extends AbstractController
+{
 
-    public function process(Request $request): Response {
+    public function process(Request $request): Response
+    {
         $authGuard = new AuthGuard();
         $user = $authGuard->authorize($request, ['admin', 'editor', 'author']);
         if ($user instanceof Response) {
@@ -38,8 +40,8 @@ class GetDocumentVersionsController extends AbstractController {
             );
         }
 
-        // Un author/editor ne voit que les versions de ses propres documents
-        if (in_array($user->getRole(), ['editor', 'author']) && $document->author_id !== $user->getId()) {
+        // Un author ne voit que les versions de ses propres documents
+        if ($user->getRole() === 'author' && $document->author_id !== $user->getId()) {
             return new Response(
                 json_encode(['error' => 'forbidden']),
                 403,
@@ -62,5 +64,3 @@ class GetDocumentVersionsController extends AbstractController {
         );
     }
 }
-
-?>
