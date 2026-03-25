@@ -36,7 +36,7 @@
   &__filters {
     display: grid;
     gap: $spacing-md;
-    grid-template-columns: repeat(4, minmax(140px, 1fr)) auto;
+    grid-template-columns: 1fr;
     align-items: end;
     margin-bottom: $spacing-md;
 
@@ -51,7 +51,7 @@
 
   &__stats {
     display: grid;
-    grid-template-columns: repeat(2, minmax(180px, 1fr));
+    grid-template-columns: 1fr;
     gap: $spacing-md;
     margin-bottom: $spacing-md;
   }
@@ -77,7 +77,7 @@
   &__inline-form {
     display: grid;
     gap: $spacing-sm;
-    grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+    grid-template-columns: 1fr;
     margin-bottom: $spacing-md;
     align-items: end;
   }
@@ -86,26 +86,64 @@
     display: flex;
     gap: $spacing-xs;
     flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  &__role-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: $spacing-md;
+  }
+
+  &__quick-form {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+
+    .form__group {
+      margin-bottom: 0;
+    }
+  }
+
+  &__quick-form-content {
+    grid-column: 1 / -1;
   }
 }
 
 @include md {
   .backoffice-page {
     &__filters {
-      grid-template-columns: repeat(2, minmax(140px, 1fr));
+      grid-template-columns: repeat(2, minmax(150px, 1fr));
     }
 
     &__inline-form {
-      grid-template-columns: repeat(2, minmax(140px, 1fr));
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
     }
 
     &__stats {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+
+    &__quick-form {
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
     }
   }
 }
 
-@include sm {
+@include lg {
+  .backoffice-page {
+    &__filters {
+      grid-template-columns: repeat(4, minmax(140px, 1fr)) auto;
+    }
+
+    &__inline-form {
+      grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+    }
+  }
+}
+
+@media (max-width: 640px) {
   .backoffice-nav {
     align-items: stretch;
 

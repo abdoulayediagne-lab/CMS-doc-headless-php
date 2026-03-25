@@ -9,7 +9,15 @@ body {
   line-height: var(--line-height-base);
   color: var(--color-text);
   background-color: var(--color-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   @include transition(background-color, color);
+}
+
+main {
+  width: 100%;
+  flex: 1;
 }
 
 // Keep native hidden semantics even when utility/component classes set display.

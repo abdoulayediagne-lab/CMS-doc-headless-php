@@ -13,8 +13,16 @@
 
   &__hero {
     background:
-      radial-gradient(circle at 12% 18%, rgba(37, 99, 235, 0.18), transparent 42%),
-      radial-gradient(circle at 82% 20%, rgba(8, 145, 178, 0.15), transparent 44%),
+      radial-gradient(
+        circle at 12% 18%,
+        rgba(37, 99, 235, 0.18),
+        transparent 42%
+      ),
+      radial-gradient(
+        circle at 82% 20%,
+        rgba(8, 145, 178, 0.15),
+        transparent 44%
+      ),
       var(--color-bg);
     border: 1px solid var(--color-border);
     margin-bottom: $spacing-xl;
@@ -83,8 +91,16 @@
     }
   }
 
+  &__doc {
+    .card__body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
+  }
+
   &__tags {
-    margin-top: $spacing-md;
+    margin-top: auto;
     display: flex;
     gap: $spacing-xs;
     flex-wrap: wrap;
