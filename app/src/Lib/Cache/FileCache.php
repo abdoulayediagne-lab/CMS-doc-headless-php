@@ -7,7 +7,7 @@ class FileCache {
     private int $defaultTtl;
 
     public function __construct(?string $cacheDir = null, int $defaultTtl = 60) {
-        $this->cacheDir = $cacheDir ?? dirname(__DIR__, 4) . '/cache/http';
+        $this->cacheDir = $cacheDir ?? dirname(__DIR__, 3) . '/cache/http';
         $this->defaultTtl = max(1, $defaultTtl);
     }
 
