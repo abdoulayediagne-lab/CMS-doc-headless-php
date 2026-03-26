@@ -48,6 +48,8 @@
   const documentFormStatus = document.getElementById("document-form-status");
   const adminUsersCount = document.getElementById("admin-users-count");
   const adminDocumentsCount = document.getElementById("admin-documents-count");
+  const adminViewsCount = document.getElementById("admin-views-count");
+  const adminTopDocuments = document.getElementById("admin-top-documents");
 
   const currentUserBadge = document.getElementById("current-user");
   const dashboardAdmin = document.getElementById("dashboard-admin");
@@ -774,13 +776,21 @@
       if (adminDocumentsCount) {
         adminDocumentsCount.textContent = "-";
       }
+      if (adminViewsCount) {
+        adminViewsCount.textContent = "-";
+      }
+      if (adminTopDocuments) {
+        adminTopDocuments.innerHTML =
+          '<li class="text-muted">Réservé à l\'administrateur.</li>';
+      }
       return;
     }
 
     try {
-      const [usersPayload, documentsPayload] = await Promise.all([
+      const [usersPayload, documentsPayload, analyticsPayload] = await Promise.all([
         api("/admin/users?page=1&limit=1", { method: "GET" }),
         api("/documents?page=1&limit=1", { method: "GET" }),
+        api("/admin/analytics", { method: "GET" }),
       ]);
 
       if (adminUsersCount) {
@@ -794,12 +804,41 @@
             0,
         );
       }
+      if (adminViewsCount) {
+        adminViewsCount.textContent = String(analyticsPayload.total_views || 0);
+      }
+      if (adminTopDocuments) {
+        const topDocuments = analyticsPayload.top_documents || [];
+        if (topDocuments.length === 0) {
+          adminTopDocuments.innerHTML =
+            '<li class="text-muted">Aucune donnée pour le moment.</li>';
+        } else {
+          adminTopDocuments.innerHTML = topDocuments
+            .map(function (item) {
+              return (
+                "<li>" +
+                escapeHtml(item.title || item.slug || "Document") +
+                " - " +
+                escapeHtml(String(item.views || 0)) +
+                " vues</li>"
+              );
+            })
+            .join("");
+        }
+      }
     } catch (error) {
       if (adminUsersCount) {
         adminUsersCount.textContent = "-";
       }
       if (adminDocumentsCount) {
         adminDocumentsCount.textContent = "-";
+      }
+      if (adminViewsCount) {
+        adminViewsCount.textContent = "-";
+      }
+      if (adminTopDocuments) {
+        adminTopDocuments.innerHTML =
+          '<li class="text-muted">Impossible de charger les analytics.</li>';
       }
     }
   }
