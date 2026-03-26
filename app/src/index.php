@@ -41,7 +41,9 @@ try {
     $request = new Request();
     $response = Router::route($request);
 
-    header($response->getHeadersAsString());
+    foreach ($response->getHeaders() as $headerName => $headerValue) {
+        header($headerName . ': ' . $headerValue);
+    }
     http_response_code($response->getStatus());
     echo $response->getContent();
     exit();

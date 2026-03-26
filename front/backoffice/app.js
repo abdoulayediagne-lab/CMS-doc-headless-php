@@ -376,9 +376,9 @@
       setAlert(
         dashboardAlert,
         "info",
-        "Éditeur: creation, modification et suppression de tous les documents.",
+        "Éditeur: création, modification et suppression de tous les documents.",
       );
-      dashboardRoleTitle.textContent = "Creation rapide";
+      dashboardRoleTitle.textContent = "Création rapide";
       dashboardRoleDescription.textContent =
         "Tu peux créer, modifier et supprimer n'importe quel document.\nTu n'as pas accès a l'administration utilisateurs/tags/sections/logs.";
       dashboardQuickCreateForm.hidden = false;
@@ -408,7 +408,7 @@
     } else {
       dashboardAdmin.hidden = true;
       setAlert(dashboardAlert, "info", "Lecteur: accès en lecture uniquement.");
-      dashboardRoleTitle.textContent = "Acces lecture";
+      dashboardRoleTitle.textContent = "Accès lecture";
       dashboardRoleDescription.textContent =
         "Tu ne peux ni créer, ni modifier, ni supprimer de document.\nTu peux consulter les documents publies via la vitrine publique.";
       dashboardOpenDocuments.hidden = true;
@@ -621,7 +621,7 @@
     setAlert(
       documentFormStatus,
       "info",
-      "Creation autorisee pour admin, editeur et auteur. Modification/suppression limitee aux droits du role.",
+      "Création autorisée pour admin, éditeur et auteur. Modification/suppression limitée aux droits du rôle.",
     );
   }
 
@@ -1181,7 +1181,7 @@
           setAlert(
             documentsStatus,
             "warning",
-            "Tu ne peux supprimer que les documents autorises par ton role.",
+            "Tu ne peux supprimer que les documents autorises par ton rôle.",
           );
           return;
         }
@@ -1236,7 +1236,7 @@
       setAlert(
         documentFormStatus,
         "warning",
-        "Creation reservee aux roles admin, editeur et auteur.",
+        "Création réservée aux rôles admin, éditeur et auteur.",
       );
       return;
     }
@@ -1385,7 +1385,7 @@
       setAlert(
         adminStatus,
         "danger",
-        "Creation tag impossible: " + error.message,
+        "Création tag impossible: " + error.message,
       );
     }
   });
@@ -1484,7 +1484,7 @@
       setAlert(
         adminStatus,
         "danger",
-        "Creation section impossible: " + error.message,
+        "Création section impossible: " + error.message,
       );
     }
   });
@@ -1715,7 +1715,7 @@
       setAlert(
         dashboardQuickCreateStatus,
         "warning",
-        "Creation reservee aux roles admin, editeur et auteur.",
+        "Création réservée aux rôles admin, éditeur et auteur.",
       );
       return;
     }
@@ -1738,7 +1738,7 @@
     }
 
     try {
-      setAlert(dashboardQuickCreateStatus, "info", "Creation en cours...");
+      setAlert(dashboardQuickCreateStatus, "info", "Création en cours...");
       await saveDocument(payload, null);
       dashboardQuickCreateForm.reset();
       quickDocumentStatus.value = "draft";
@@ -1752,7 +1752,7 @@
       setAlert(
         dashboardQuickCreateStatus,
         "danger",
-        "Creation impossible: " + error.message,
+        "Création impossible: " + error.message,
       );
     }
   });
@@ -1794,7 +1794,7 @@
       setAlert(
         dashboardQuickCreateStatus,
         "info",
-        "Formulaire de creation rapide.",
+        "Formulaire de création rapide.",
       );
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Document;
 
+use App\Lib\Cache\FileCache;
 use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
@@ -76,6 +77,12 @@ class DeleteDocumentController extends AbstractController
             $oldValues,
             null
         );
+
+        try {
+            (new FileCache())->deleteByPrefix('public');
+        } catch (\Throwable $exception) {
+            // Cache invalidation failure should not block write operations.
+        }
 
         return new Response('', 204, ['Content-Type' => 'application/json']);
     }
