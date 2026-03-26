@@ -6,6 +6,7 @@ use App\Lib\Controllers\AbstractController;
 use App\Lib\Http\Request;
 use App\Lib\Http\Response;
 use App\Repositories\DocumentRepository;
+use App\Repositories\PageViewRepository;
 
 class GetPublicDocumentController extends AbstractController {
     public function process(Request $request): Response {
@@ -31,6 +32,18 @@ class GetPublicDocumentController extends AbstractController {
 
         $tagsByDocumentId = $documentRepository->findTagsForDocumentIds([$document->getId()]);
         $tags = $tagsByDocumentId[$document->getId()] ?? [];
+
+        $pageViewRepository = new PageViewRepository();
+        try {
+            $pageViewRepository->recordView(
+                (int) $document->getId(),
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $request->getHeader('User-Agent'),
+                $request->getHeader('Referer')
+            );
+        } catch (\Throwable $exception) {
+            // Keep document delivery resilient even if analytics insert fails.
+        }
 
         return new Response(
             json_encode([
